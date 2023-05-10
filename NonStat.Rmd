@@ -1,0 +1,46 @@
+---
+title: "Final Project: Bayesian Inference Clinical Trials and Nonparametric Models"
+author: "Non-stat Team: Captain: Xinyi Zhang, Members: ..."
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+# Introduction
+
+- Background of the study
+
+# Literature Review
+
+- Review of the CRM design for phase I dose-finding trials
+
+# Methodology
+
+- Description of the logistic regression model used
+
+## Model Reproduction
+
+- Reproduce results in Figures 6 & 7
+
+```{r echo=TRUE}
+# R code for model reproduction goes here
+```
+
+## Simulation Studies
+```{r}
+# R code for simulation studies goes here
+```
+
+## Results and Discussion
+Answers to the questions
+
+## Conclusion
+Summary of the report
+
+## Appendix
+Any additional R code goes here
+
+
+
+
+
+
