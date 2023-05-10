@@ -8,6 +8,20 @@ This repository contains the final project for our graduate-level class in Bayes
 - Captain: Zhang, Xinyi
 - Members: ...
 
+## Task Overview
+Our main tasks involve:
+
+1. Reviewing a paper on CRM design for phase I dose-finding trials.
+2. Reproducing results in specific figures by fitting a logistic regression model.
+3. Running simulation studies using the CRM with logistic regression.
+4. Answering specified research questions.
+5. Writing a report and compiling our work in an R Markdown document.
+6. Presentation
+
+Detailed task, assignees, and progress can be tracked under the "Projects" tab in our GitHub repository.
+
+
+
 ## Project Structure
 
 - `Non_Stat.Rmd`: R Markdown document containing the full report for the project, including the review, model reproduction, simulation studies, and answers to the questions.
