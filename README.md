@@ -6,7 +6,7 @@ This repository contains the final project for our graduate-level class in Bayes
 ## Team
 
 - Captain: Zhang, Xinyi
-- Other members: ...
+- Members: ...
 
 ## Project Structure
 
