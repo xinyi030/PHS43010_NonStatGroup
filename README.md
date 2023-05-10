@@ -28,7 +28,7 @@ Detailed task, assignees, and progress can be tracked under the "Projects" tab i
 
 ## Instructions
 
-To run the R Markdown document, you need to have R installed on your computer along with the necessary packages (listed at the start of the `my_report.Rmd` file). Once you have these, you can open `my_report.Rmd` in RStudio and click the "Knit" button to generate the report.
+To run the R Markdown document, you need to have R installed on your computer along with the necessary packages (listed at the start of the `Non_Stat.Rmd` file). Once you have these, you can open `Non_Stat.Rmd` in RStudio and click the "Knit" button to generate the report.
 
 ## Collaboration Guidelines
 
@@ -57,4 +57,4 @@ Please note that we are using a branching strategy for this project. This means 
 All team members are expected to contribute to the project. If you have any issues, please use the Issues tab on GitHub.
 
 Thank you!
-Xinyi
+
