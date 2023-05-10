@@ -30,7 +30,7 @@ Here are the steps to collaborate on this project using GitHub:
 
 5. **Push Your Changes**: After committing your changes, you need to push them to the repository. You can do this with the command `git push origin master`.
 
-6. **Resolve Any Conflicts**: If someone else has made changes to the same sections of the `my_report.Rmd` file, there may be conflicts when you try to push your changes. If this happens, Git will give you instructions on how to resolve the conflicts.
+6. **Resolve Any Conflicts**: If someone else has made changes to the same sections of the `NonStat.Rmd` file, there may be conflicts when you try to push your changes. If this happens, Git will give you instructions on how to resolve the conflicts.
 
 Please remember to always pull the latest changes before you start working and to commit and push your changes regularly.
 
