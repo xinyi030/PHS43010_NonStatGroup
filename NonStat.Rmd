@@ -21,9 +21,119 @@ output: pdf_document
 
 - Reproduce results in Figures 6 & 7
 
-```{r echo=TRUE}
-# R code for model reproduction goes here
+### Figure 6
+
+```{r}
+d = c(0.5, 1, 3, 5, 6)
+y = c(0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1)
+x = c(rep(d[1], 3), rep(d[3], 3), rep(d[4], 12))
+data = data.frame(x, y)
 ```
+
+Fit logit model
+
+```{r}
+logit = glm(y ~ x, data = data, family = "binomial")
+x_pred = with(data, data.frame(x = d))
+tbl = cbind(x_pred, predict(logit, newdata = x_pred, type = "link", se = TRUE))
+tbl = within(tbl, {p = plogis(fit); lb = plogis(fit - (1.96 * se.fit)); ub <- plogis(fit + (1.96 * se.fit))})
+tbl
+```
+
+plot
+
+```{r}
+ggplot(tbl) + 
+geom_line(aes(x, p)) + geom_point(aes(x, p), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) + 
+geom_line(aes(x, ub), linetype = 2) + geom_point(aes(x, ub), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) +
+geom_line(aes(x, lb), linetype = 2) + geom_point(aes(x, lb), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) +
+geom_hline(yintercept = 0.33, col = 'red', linetype = 2, linewidth = 0.8) + 
+theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+scale_x_continuous(breaks = d) + labs(title = 'Repeat Figure 6(b)', x = 'Dose', y = 'Probability of DLT')
+```
+
+### Figure 7 
+
+```{r}
+d = c(10, 20, 40, 100, 200, 400, seq(800, 6400, by = 800))
+y = rep(0, 37)
+y[c(26, 35, 37)] = 1
+x = c(d[1:11], rep(d[10], 3), rep(d[11], 4), rep(d[12], 8), rep(d[13], 6), 
+      rep(d[14], 5))
+data = data.frame(x, y)
+```
+
+Fit logit model
+
+```{r}
+logit = glm(y ~ x, data = data, family = "binomial")
+x_pred = with(data, data.frame(x = d))
+tbl = cbind(x_pred, predict(logit, newdata = x_pred, type = "link", se = TRUE))
+tbl = within(tbl, {p = plogis(fit); lb = plogis(fit - (1.96 * se.fit)); ub <- plogis(fit + (1.96 * se.fit))})
+tbl
+```
+
+plot
+
+```{r}
+ggplot(tbl) + 
+geom_line(aes(x, p)) + geom_point(aes(x, p), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) + 
+geom_line(aes(x, ub), linetype = 2) + geom_point(aes(x, ub), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) +
+geom_line(aes(x, lb), linetype = 2) + geom_point(aes(x, lb), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) +
+geom_hline(yintercept = 0.2, col = 'red', linetype = 2, linewidth = 0.8) + 
+theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+scale_x_continuous(breaks = d[-(2:6)]) + labs(title = 'Repeat Figure 7(b)', x = 'Dose', y = 'Probability of DLT')
+```
+
+
+
+### Zikai's version
+
+- prior: an exponential prior distribution with a mean of 1
+- Dose labels were calculated using the skeleton and prior mean estimate of the model parameter.
+
+
+```{r}
+library(ggplot2)
+library(bcrm)
+y = c(0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1)
+skeleton <- c(0.05, 0.10, 0.15, 0.33, 0.50)
+dose <- c(0.5, 1, 3, 5, 6)
+#x = c(rep(d[1], 3), rep(d[3], 3), rep(d[4], 12))
+prior_tox = c(rep(skeleton[1], 3), rep(skeleton[3], 3), rep(skeleton[4], 12))
+data = data.frame(patient = 1:18, dose = c(rep(1, 3), rep(3, 3), rep(4, 12)), tox = y)
+
+target_tox = 0.33
+
+logit_bcrm <- bcrm(stop=list(nmax=18), data=data, p.tox0=skeleton, dose = dose,
+                      ff="logit1", prior.alpha=list(1, 1, 1), target.tox=target_tox, 
+                      constrain=F, sdose.calculate="median", pointest="mean")
+
+print(logit_bcrm)
+```
+
+```{r}
+logit_bcrm_results <- 
+  data.frame(dose, pt_est = c(0.0765, 0.1350, 0.1890, 0.364, 0.523), 
+             lb = c(0.0111, 0.0280, 0.049, 0.158, 0.314),
+             ub = c(0.2260, 0.3320, 0.409, 0.590, 0.704))
+
+
+fig6b <- ggplot(logit_bcrm_results) + 
+  geom_line(aes(dose, pt_est), linetype = "solid") + geom_point(aes(dose, pt_est), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) + 
+  geom_line(aes(dose, ub), linetype = "dashed") + geom_point(aes(dose, ub), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) +
+  geom_line(aes(dose, lb), linetype = "dashed") + geom_point(aes(dose, lb), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) +
+  geom_hline(yintercept = 0.33, col = 'red', linetype = "longdash", linewidth = 0.8) + 
+  theme_bw() + 
+  scale_x_continuous(breaks = d) + labs(title = 'Replicated Figure 6(b)', x = 'Dose', y = 'Probability of DLT')+
+  theme(  legend.key=element_blank(),
+                legend.position="top") 
+
+fig6b
+ggsave(fig6b, "fig6b_zkl.png")
+```
+
+
 
 ## Simulation Studies
 ```{r}
