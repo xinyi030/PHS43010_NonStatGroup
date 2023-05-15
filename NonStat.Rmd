@@ -162,7 +162,7 @@ geom_line(aes(x, ub), linetype = 2) + geom_point(aes(x, ub), shape = 21, colour 
 geom_line(aes(x, lb), linetype = 2) + geom_point(aes(x, lb), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) +
 geom_hline(yintercept = 0.2, col = 'red', linetype = 2, linewidth = 0.8) + 
 theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-scale_x_continuous(breaks = d[-(2:6)]) + labs(title = 'Repeat Figure 7(b)', x = 'Dose', y = 'Probability of DLT')
+scale_x_continuous(breaks = dose[-(2:6)]) + labs(title = 'Repeat Figure 7(b)', x = 'Dose', y = 'Probability of DLT')
 ```
 
 
