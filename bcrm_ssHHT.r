@@ -12,8 +12,6 @@ p.tox0 <- c(0.05, 0.10, 0.15, 0.33,0.50)
 nsims <- 1000
 
 # 1. Initialize the parameters of bcrm.
-stop <- list(nmax=36, nmtd = NULL, precision = NULL, nmin = NULL, safety = NULL)
-ff <- "logit2"
 target.tox <- 1/3
 mu <- c(2.15, 0.52)
 Sigma <- rbind(c(0.84^2, 0.134), c(0.134, 0.80^2))
@@ -43,4 +41,4 @@ for (i in 1:nsims) {
 
 table(mtds)/1000
 print(bcrm.sim)
-plot(bcrm.sim, trajectories=TRUE,  file="bcrm_ssHHT_scenario2.pdf")
+plot(bcrm.sim, trajectories=FALSE,  file="bcrm_ssHHT_scenario2_summary.pdf")
