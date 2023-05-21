@@ -1,0 +1,161 @@
+---
+title: "Final Project: Bayesian Inference Clinical Trials and Nonparametric Models"
+author: "Non-stat Team: Captain: Xinyi Zhang, Members: ..."
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+# Introduction
+
+-   Background of the study
+
+# 2. Literature Review
+
+-   Review of the CRM design for phase I dose-finding trials
+
+### 2.1 Summary for references 1-5 (by Tongtong Jin)
+
+#### Phase 1 trial and maximum tolerated dose (MTD)
+
+The phase 1 trials in oncology are usually designed to obtain the optimal dose of a new treatment for efficacy testing in subsequent phase 2 trials. For cytotoxic agents, the probability of treatment benefit is presumed to be positively proportional to the dose in a certain range of consideration. Thus, the optimal dose in phase 1 trial is usually considered as the highest dose at a tolerable level of toxicity. And the optimal dose we are seeking for is exactly the maximum tolerated dose (MTD).
+
+To define MTD in a more rigorous way, it is the dose expected to produce some degree of medically unacceptable, dose limiting toxicity (DLT) in a specified proportion $\theta$ of patients. Namely,
+
+$$Prob(DLT | Dose = MTD) = \theta,$$ where the proportion $\theta$ is also defined as the target toxicity level (TTL)$^{[1][2]}$.
+
+#### Dose escalation methods in phase 1 trials
+
+To find the MTD we defined above, in clinical testing we adopt dose escalation methods, which is based on the prior belief that the toxicity increases monotonically with increasing dose. The principle of dose escalation in phase 1 trials is both maintaining the toxicity at a safe level and the information accumulation at a rapid speed and at the same time avoid patients being exposed to subtherapeutic doses as much as possible.
+
+Dose escalation methods can be mainly classified in two branches, rule-based designs such as traditional 3+3 design and model-based designs such as continual reassessment method. Rule-based designs don't make any assumptions for the function of toxicity with respect to dose level. And the next step of dose is purely dependent on the information from the last dose. Then finally terminates at some certain stopping criteria. But model-based designs assume there's a specific function between dose and toxicity, usually power functions, logistic functions etc., and then apply accumulated information from every dose to determine the next dose.
+
+From the perspective of practical use, rule-based designs like traditional 3+3 are easier to implement, but model-based designs need biostatistical expertise and available software on site to perform real-time model fitting. As for the information utilization, rule-based designs only use current information, but model-based designs make use of all toxicity information accumulated during the trial, which can be more comprehensive. In the aspect of the exposure to subtherapeutic doses, model-based designs relatively treat fewer patients at suboptimal doses than rule-based ones. Hence according to the principle of dose escalation methods, the model-based designs usually do better in rapid information accumulation and reducing excessive exposure to subtherapeutic doses.$^[1]$.
+
+#### Current popularity of rule-based designs and model-based designs in phase 1 trials
+
+Although the model-based designs show great advantages in many aspects, rule-based designs like the 3+3 design are still more prevailingly used, and model-based designs are rarely used. Some statistical results about the popularity of these two types of methods in phase 1 trials are as follows.
+
+Reference [4] examined through the records of cancer phase 1 trial from the Science Citation Index database from 1991 to 2006 and divided them into two sets (dose-finding trials and methodologic studies of dose-escalation designs). Then track among these two sets which trials adopted new statistical designs. As a result, only 1.6% trials follow one of the methodologic studies and show extensive lags on publication time. The rest of the trials all follow the traditional up-and-down method (a type of rule-based method).
+
+Reference [5] studied the degree of adoption of the methods with new trial designs on early phase trials of molecularly targeted agents (MTA) and immunotherapies. It searched papers published from 2008 to 2014 about phase 1 oncology trials and found that in dose-finding trials, 92.9% of them utilized rule-based designs and 5.4% used model-based designs or other novel designs. Particularly, among the MTA and immunotherapies trials, 5.8% used model-based designs. The results show that the adoption of model-based designs and novel designs remains low.
+
+Above phenomenon could be caused by limited time and effort of clinicians and statisticians and the lack of comprehensive and detailed tutorials and instructions for the newly designed approaches.$^{[4][5]}$.
+
+
+
+
+
+
+
+### 2.2 Summary for references 6-10 (by Yiwei Ding)
+
+#### Reference 6: Experimental designs for phase I and phase I/II dose-finding studies
+
+For the atistical design of dose-finding studies,  the standard design is a ‘memoryless’ design and it's not so satisfying. This paper describes designs with memory and we discuss how these designs are superior to memoryless designs. The most well-known design with memory is the continual reassessment method (CRM).
+
+#### Reference 7: Adaptive designs for dual-agent phase I dose-escalation studies**
+
+Carrying out dual-agent phase I trials for medications is crucial. There are predominantly two kinds of dose-escalation trials: rule-based and model-based. Trials based on models are progressively adjusted with the help of Bayesian techniques, which merge preliminary data concerning the dose-toxicity relationship. Studies using simulations indicate that model-driven designs tend to treat a greater proportion of patients at near-optimal dose levels.
+
+#### Reference 8: A quick guide why not to use A+B designs
+
+This paper summarize why model­based designs such as the continual reassessment method (CRM) are more available than 3+3 and similar rule­based A+B designs. Compared with rule-based designs, Model­based designs can clearly define and can flexibly choose target DLT rate; many patients can be treated at the optimal dose; few patients can be treated at subtherapeutic doses; the utilisation of available data is efficient; extension to more complex questions is smooth & straightforward; deviations from the plan are easily accommodated.
+
+
+#### Reference 9: Principles of dose finding studies in cancer: a comparison of trial designs
+
+There are three classes of dose-escalation trial design: gorithmic approaches (including the popular 3+3 design), Bayesian
+model-based designs and Bayesian curve-free methods. The main benefit of algorithmic approaches is the simplicity. Model-based and curve-free Bayesian approaches are more preferable because they are more able to identify the dose with the desired toxicity rate and allocate a greater proportion of patient. For statistical and practical reasons, Bayesian model-based or curve-free approach is better.  If there is sufficient evidence of high enough quality from previous studies, the model-based approach will be better, otherwise curve-free one is better.
+
+#### Reference 10: Continual Reassessment Method: A Practical Design for Phase 1 Clinical Trials in Cancer
+
+For the design and analysis of Phase I clinical trails in cancer, attention focuses rather on identifying a dose with a given targeted level is the best estimate of this level. Such sequential designs is called continual reassessment method (CRM). In the procedure, we update our notion of the dose-reponse relationship. From the simulations, this method is good.
+
+
+
+### 2.3 Summary for references 11-15 (by Ujjwal Sehrawat)
+[11.] O, Quigley J. Another look at two phase I clinical trial designs. Stat Med.1999;18:2683–90.
+
+This paper is a critical response to a paper by Korn et al. which—1. compared the standard design (3+3) (Storer) vs the CRM design (introduced by O’ Quigley) and 2. concluded that CRM designs take 2.5 times longer to complete and are less safe (due to CRM’s tendency of treating patients at dose levels higher than the MTD) using a set of simulations for 3 different dose toxicity situations. The present paper argues that Korn et al.’s conclusions were wrong because they use false assumptions as they never use CRM as defined by O’Quigley, Pepe, and Fisher but instead a modified version. This paper further takes up the cases analyzed by Korn et al. and compares them to the intended actual (correctly defined) CRM model using the same comparison tools as Korn et al and reverse all their conclusions. 
+
+Korn et al. compared 2 phase 1 trial designs in cancer. Standard design (as described by Storer) vs the Continual Reassessment Method (CRM) (introduced by O’Quigley et al) and made the 2 aforementioned negative conclusions about CRMs. Issues with this work: 
+Didn’t use the actual CRM but a modified version by incorporating a stopping rule. 
+The modified version of CRM model used does not even belong to the CRM class of models by failing to satisfy elementary conditions specified in O’Quigley’s original specification of CRM. Recent work by Shen and O’Quigley shows that in order to demonstrate convergence to the correct dose level, these elementary conditions must be respected. Conditions violated by Korn et al were M1(b) of paper by Shen and O’Quigley and also mentioned in O’Quigley et al’s paper page 36 stating “We want a model rich enough so that for any dose, say x, and probability of response theta, there is a parameter, say, a, such that phi(x,a) = theta. Here phi refers to the 1 param working model.
+Sample sizes used by the author’s sequential CRM and the standard method differed significantly  
+
+What the present paper did: 
+
+CRM being a fixed sample scheme, they took sample size for CRM to be the nearest integer to the average sample size of the standard scheme as presented by Korn et al. 
+Use model presented by O’Quigley et al.
+To enhance comparability, started experimentation for CRM at the lowest available level (as did Korn et al.) but they also escalated patients 3 at a time until the first observed toxicity. 
+Once toxicity is observed, CRM proceeds as usual, either using a Bayesian approach or via MLE.
+Also studied the case of 1X1 and 2X2 escalation - leading to essential no difference in conclusions.
+
+Tackling specific issues about CRM raised by Korn et al:
+
+TRIAL DURATION: Standard design includes patients 3 at a time while CRM includes patients 1 at a time but can be modified to have grouped inclusions (section 3 of O’Quigley paper). Thus, for group sizes of 3, time required is the same for CRM and 3+3. Korn et al did not consider the grouped (comparable) case and assumed that it would perform poorly. Also, Goodman et al., who tried inclusions of 1 patient at a time, 2 patients at a time, and 3 patients at a time, concluded that there is no pronounced drop in accuracy in CRM when allocating 3 patients at a time rather than 1 at a time, thus refuting Korn et al’s assumption about the 3 group case. Another argument given about further evidence that show that for moderate sample sizes (16 to 25), the differences in operating characteristics on the basis of group size (1,2,3) are, as noted b y Goodman et al, small enough to be ignored. Trial duration can therefore be seen to be simply a function of design!! 
+SAFETY: No. of papers on the basis of extensive simulations conclude that CRM is more efficient and safer than the standard design. Korn et al. came to the opposite conclusion saying “With CRM more patients will be treated at very high does and that CRM treats 70% more patients at dose levels 2 higher than the MTD than the standard method.’ 70% was an indirect calculation for which the higher dose levels in question used 12% by modified CRM and 7% by standard method = not much difference and a misleading interpretation by korn et al.. 
+CONCLUSION: It is safer for a randomly chosen patient to be included in a CRM design than a standard design. Moreover, in all 3 situations the probability of being treated at very high toxic levels is always higher with the standard than the CRM design. If the definition of safety is widened to include the concept of treating patients at unacceptably low sub therapeutic levels, then CRM still performs much better. This makes sense since the rationale behind CRM is to concentrate experimentation around a pre-specified target. Unlike 3+3, it is entirely straightforward to adjust CRM to make it safe as we require. All it requires is to change the target level, say from 0.2 to 0.1. In this case, the observed number of toxicities will be, on average, roughly halved. One of the main advantages of CRM is its flexibility and ability to be adapted to potentially different situations unlike the standard model which is rigid, samples independently of any targeted percentile, and has no convergence properties. The very reason for development of CRM was to reducing the risk of being given sub therapeutic doses. 
+FUTURE SCOPE OF CRM: CRM achieves what it is being asked for : to target some given toxicity level and to concentrate experimentation around that level, using only the information available for independent toxic responses (yes/no) given the dose level. This is nonetheless a limited goal and subsequent progress in the area is needed. It is likely to come from techniques which incorporate additional information such as pharmacokinetics, group heterogeneity, graded toxicities and intra-patient studies. None of these potential developments can be addressed in a constructive way via the standard method. It is important to note that the paper’s comparison parameters are driven by the standard method, parameters that have often placed the method in an artificially favorable light. The sample sizes used by CRM were made comparable to a scheme with an ad hoc stopping rule.
+
+### 2.4 Summary for references 16-20 (by William)
+
+CRM is an alternative to the standard 3+3 design based on using a model like a one parameter or two parameter logistic model, to understand the maximum tolerated dose in a phase 1 trial. CRM is more accurate in choosing the MTD, is less likely to choose ineffective doses, treats fewer patients at overly toxic doses, and treats fewer patients at very low doses (Garrett-Mayer E). Our paper plans to looks a two parameter model. A two-parameter model is likely to better estimate the shape of the entire dose-toxicity relationship [34], but less efficiently identify the MTD; it may take longer to reach the MTD since two parameters must be estimated, and there may be difficulties fitting the model or obtaining consistent estimates of model parameters [31].  
+	
+The idea behind the CRM stars with a priori dose toxicity curve and a chosen target toxicity rate. Theis curve will be refit after every cohort( 1-3 patients)toxicity outcome is observed. At every new dose or same dose the all prior data is used to update the model/curve (Garrett-Mayer E).  As required a discussion needs to take place with all relevant stakeholders. The target toxicity level is typically set between 20 to 25% and can be as high as 40%[27, 28]. In a review of 197 phase I trials published between 1997 and 2008, the median number of dose levels explored was five (range 2–12) [26]. 
+	
+Inference or decisions can be made using a likelihood or Bayesian methods  using the accruing trial data and clinical judgment. In a Bayesian method data from patients in the trial is used to update prior on the model distribution which then gives a posterior distribution for the model parameters and therefore posterior beliefs for the probability of DLT at each dose. These posterior probabilities are used to make dose escalation decisions. By assessing a design’s operating characteristics with a specific prior in a variety of scenarios, the prior distribution can be recalibrated until the model makes recommendations for dose escalations and the MTD that the trial team are happy with (Wheeler,M Graham).  
+	
+Possible decision rules include choosing the dose with an estimated probability of DLT closest to the TTL or, more conservatively, choosing the dose with an estimated probability of DLT closest to, but not greater than, the TTL. The first option allows quicker escalation towards the true MTD, but may expose more patients to overdoses. The second option reduces the chance of overdosing patients, but may take longer to escalate towards the true MTD (Wheeler,M Graham)
+
+Samples size are determined by the study and how and where its being conducted. Specifying a lower bound based on Cheung’s work and practical upper bound in trial protocols. Cheung [45] proposed formulae that use a target average percentage of correctly selecting the MTD (say, 50% of the time) to obtain a lower bound for the trial sample size (Wheeler,M Graham).  Although CRM designs, like standard ones, can halt after only 10–14 subjects, it is typically necessary to plan for at least 18–24 total subjects, after which the probability of a correct MTD choice rises slowly with sample size [17].Cohort size at each dose level typically is more than 1. A cohort size of one allow better understanding of operating characteristics but this is rarely used [17]. There could be regulatory constraints. If cohort size is greater than 2, then a monitoring plan is needed.
+	
+Stopping rules for the trial include the following examples. Early termination can be considered if the MTD is judged to be outside the planned set of doses. Adding additional patients is unlikely to yield information that would change the current MTD estimate. Fixed no of patients has been consecutively dosed at one dose level. Estimated probability of all dose levels having a DLT rate about the TTL is at least 90%. The probability that the next m patients to be dose in the trial will be given the same dose levels, regardless of DLT outcomes observed, exceed some level (Wheeler,M Graham). 
+
+
+
+# 3. Methodology
+#### 3.1 Describe the use of the logistic regression model in our study (By Tongtong Jin)
+
+The model we use here to predict the relation between dose level and the probability of DLT is the two-parameter logistic regression model which has the form as follows: $$p_j=p(d_j|\beta_1,\beta_2)=\frac{exp(\beta_1+exp(\beta_2)d_j)}{1+exp(\beta_1+exp(\beta_2)d_j)}.$$ And in Bayesian setting, this is the likelihood function for dose level j given $\beta_1$ and $\beta_2$.
+
+### Bayesian CRM
+
+In the Bayesian setting of CRM, we first need to choose the prior distributions of parameters $\beta_1$ and $\beta_2$. Let's denote the prior by $f(\beta_1,\beta_2)$. Then the posterior distribution given the data of k dose levels $D_k$ is as follows: $$L(D_k|\beta_1,\beta_2)=\prod_{j=1}^{k}p_j^{y_j}(1-p_j)^{n_j-y_j} ,$$ where $n_j$ is the number of tested patients at the j-th dose level, and $y_j$ is the number of patients showing DLT at the j-th dose level. Then we can get to the posterior distribution given $D_k$ by applying above in the Bayes' rule. The posterior is $$p_k(\beta_1,\beta_2|D_k)=\frac{L(D_k|\beta_1,\beta_2)f(\beta_1,\beta_2)}{\iint L(D_k|\beta_1,\beta_2)f(\beta_1,\beta_2)d \beta_1 d \beta_2}.$$
+
+Then the posterior mean of DLT probability at each dose level is $$\mathbf{E}[p_j|D_k]=\iint p_j p_k(\beta_1,\beta_2|D_k)d \beta_1 d \beta_2$$
+
+To look for an appropriate dose level for the next trial, our principle is to find the dose level with the DLT probability closest to TTL. Hence the next dose level can be defined as $$d_{next}=\arg\min_{d_j\in S}(|TTL-\mathbf{E}[p_j|D_k]|).$$ Here S is the set of all permissible choices of dose level.
+
+### Two-stage likelihood-based CRM
+
+Two-stage likelihood CRM divides the process into two stages. In the first stage, the patients are dosed in single-patient cohorts until the first DLT appears. After the first appearance of DLT, the CRM starts to work on the data based on all the previous trials (first-stage data included).
+
+The stage 2 procedure is similar to the above, but using a maximum likelihood estimation (MLE) to estimate the parameters $\beta_1$ and $\beta_2$ and calculate the corresponding probability of DLT at each dose level. The estimated parameters based on given data on k dose levels are $$(\hat{\beta_1},\hat{\beta_2})=\arg\max_{(\beta_1,\beta_2)} L(D_k|\beta_1,\beta_2).$$ Here $L(D_k|\beta_1,\beta_2)$ is the same as defined above in the Bayesian setting. Then we can compute the probability to DLT at each dose level under the current MLE of the parameters $p(d_j|\hat{\beta_1},\hat{\beta_2})$. Now since we want the next dose level to have the closest probability of DLT to TTL, we're able to define the next dose level by $$d_{next}=\arg\min_{d_j\in S}(|TTL-p(d_j|\hat{\beta_1},\hat{\beta_2})|).$$ Iterate above procedure until the dose level meets the stopping condition. Then the second stage terminates.
+
+
+## Model Reproduction
+
+-   Reproduce results in Figures 6 & 7
+
+```{r echo=TRUE}
+# R code for model reproduction goes here
+```
+
+## Simulation Studies
+
+```{r}
+# R code for simulation studies goes here
+```
+
+## Results and Discussion
+
+Answers to the questions
+
+## Conclusion
+
+Summary of the report
+
+## Appendix
+
+Any additional R code goes here
