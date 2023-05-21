@@ -10,6 +10,9 @@ RANDOM_SEED = 58
 rng = np.random.default_rng(RANDOM_SEED)
 warnings.filterwarnings("ignore")
 
+parquet_file_name = "S2_finished_simulations.parquet"
+pickle_file_name = "S2_sigmoid_probs.pkl"
+
 doses = [0.5, 1, 3, 5, 6] # From figure 6 and in units (mg/m^2 per day)
 # true_toxic_prob = (0.25, 0.3, 0.5, 0.6, 0.7) # Given by assignment instructions, scenario 1
 true_toxic_prob = (0.01, 0.05, 0.2, 0.3, 0.5) # Given by assignment instructions, scenario 2
@@ -91,7 +94,7 @@ def run_single_trial():
     data = sim_data(0) 
     logistic_regression_model = run_model(data)
     with logistic_regression_model:
-        idata = pm.sample(500, tune=200, chains=2, random_seed=rng, cores=4, progressbar=False, nuts_sampler='numpyro')
+        idata = pm.sampling.jax.sample_numpyro_nuts(800, 200, cores=5, target_accept=0.65, progressbar=False)
     next_dose = get_next_dose(idata)
     
     # We already went through 3 samples out of 36. 36 // 3 = 12 - 1 = 11
@@ -102,7 +105,7 @@ def run_single_trial():
         # run the model on all the data collected so far
         logistic_regression_model = run_model(data)
         with logistic_regression_model:
-            idata = pm.sample(500, tune=200, chains=2, random_seed=rng, cores=4, progressbar=False, nuts_sampler='numpyro')
+            idata = pm.sampling.jax.sample_numpyro_nuts(800, 200, cores=5, target_accept=0.65, progressbar=False)
         next_dose = get_next_dose(idata)
     
     beta0 = np.mean(idata.posterior['beta0'].values)
@@ -123,7 +126,7 @@ for sim in tqdm(range(500)):
     sigmoid_probabilities.append(trial_probabilities)
     
 # save the sigmoid probabilities to a pickle file
-with open("S2_sigmoid_probs.pkl", "wb") as f: # "wb" because we want to write in binary mode
+with open(pickle_file_name, "wb") as f: # "wb" because we want to write in binary mode
     pickle.dump(sigmoid_probabilities, f)
     
     
@@ -133,10 +136,4 @@ for i in range(len(total_data)):
     
 # combine list of dataframes to one dataframe
 total_data = pd.concat(total_data) 
-
-# update a new file name based on the files already available
-rel_files = [file.startswith("finished_simulations_") for file in os.listdir("gabe_sim_files")]
-new_index = int(max("finished_simulations_pt1.parquet"[23])) + 1
-
-new_file_name = "S2_finished_simulations.parquet"
-total_data.to_parquet(f'gabe_sim_files/{new_file_name}')
+total_data.to_parquet(f'gabe_sim_files/{parquet_file_name}')
