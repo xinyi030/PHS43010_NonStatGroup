@@ -4,13 +4,12 @@ import pymc as pm
 from tqdm import tqdm
 import pickle
 import os 
-
 RANDOM_SEED = 58
 rng = np.random.default_rng(RANDOM_SEED)
 
 doses = [0.5, 1, 3, 5, 6] # From figure 6 and in units (mg/m^2 per day)
-true_toxic_prob_s1 = (0.25, 0.3, 0.5, 0.6, 0.7) # Given by assignment instructions, scenario 1
-true_toxic_prob_s2 = (0.01, 0.05, 0.2, 0.3, 0.5) # Given by assignment instructions, scenario 2
+# true_toxic_prob = (0.25, 0.3, 0.5, 0.6, 0.7) # Given by assignment instructions, scenario 1
+true_toxic_prob = (0.01, 0.05, 0.2, 0.3, 0.5) # Given by assignment instructions, scenario 2
 
 def sigmoid(x):
   return 1 / (1 + np.exp(-x))
@@ -25,7 +24,7 @@ def sim_data(relevant_index):
     Returns:
         Pandas Dataframe: Contains the doses the three participants took and whether each participant had a toxicity event
     """
-    toxicity_observation = np.random.binomial(1, p=true_toxic_prob_s1[relevant_index], size=3) # 3 samples per cohort
+    toxicity_observation = np.random.binomial(1, p=true_toxic_prob[relevant_index], size=3) # 3 samples per cohort
     doses_observed = np.ones(3) * doses[relevant_index] # doses given to the three participants
     # store data in a dataframe that will later be concatenated to make one dataframe
     data = pd.DataFrame({'doses':doses_observed, 'toxicity_event': toxicity_observation})
