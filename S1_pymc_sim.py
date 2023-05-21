@@ -9,8 +9,8 @@ RANDOM_SEED = 58
 rng = np.random.default_rng(RANDOM_SEED)
 warnings.filterwarnings("ignore")
 
-parquet_file_name = "S2_finished_simulations.parquet"
-pickle_file_name = "S2_sigmoid_probs.pkl"
+parquet_file_name = "S1_finished_simulations_1.parquet"
+pickle_file_name = "S1_sigmoid_probs_1.pkl"
 
 def check_file_exists(file_name):
 # If the file exists, add a suffix to the filename
@@ -23,10 +23,12 @@ def check_file_exists(file_name):
             i += 1
         file_name = f'{base_name}_{i}{ext}'
     return file_name
-    
+
+parquet_file_name = check_file_exists(f"gabe_sim_files/{parquet_file_name}")
+pickle_file_name = check_file_exists(f"gabe_sim_files/{pickle_file_name}")
 
 doses = [0.5, 1, 3, 5, 6] # From figure 6 and in units (mg/m^2 per day)
-true_toxic_prob = (0.01, 0.05, 0.2, 0.3, 0.5) # Given by assignment instructions, scenario 2
+true_toxic_prob = (0.25, 0.3, 0.5, 0.6, 0.7) # Given by assignment instructions, scenario 1
 
 total_data = []
 sigmoid_probabilities = []
@@ -39,7 +41,6 @@ for sim in tqdm(range(500)):
 # save the sigmoid probabilities to a pickle file
 with open(pickle_file_name, "wb") as f: # "wb" because we want to write in binary mode
     pickle.dump(sigmoid_probabilities, f)
-    
     
 for i in range(len(total_data)):
     # add a column that tracks which simulation run is associated with each row
