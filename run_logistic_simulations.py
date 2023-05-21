@@ -114,13 +114,13 @@ def run_single_trial():
 total_data = []
 sigmoid_probabilities = []
 # we should have 1000 simulations in total
-for sim in tqdm(range(700)):
+for sim in tqdm(range(500)):
     data, trial_probabilities = run_single_trial()
     total_data.append(data)    
     sigmoid_probabilities.append(trial_probabilities)
     
 # save the sigmoid probabilities to a pickle file
-with open("sigmoid_probs_pt5.pkl", "wb") as f: # "wb" because we want to write in binary mode
+with open("S2_sigmoid_probs_pt5.pkl", "wb") as f: # "wb" because we want to write in binary mode
     pickle.dump(sigmoid_probabilities, f)
     
     
@@ -134,5 +134,5 @@ total_data = pd.concat(total_data)
 # update a new file name based on the files already available
 rel_files = [file.startswith("finished_simulations_") for file in os.listdir("gabe_sim_files")]
 new_index = int(max("finished_simulations_pt1.parquet"[23])) + 1
-new_file_name = f"finished_simulations_pt{str(new_index)}.parquet"
+new_file_name = f"S2_finished_simulations_pt{str(new_index)}.parquet"
 total_data.to_parquet(f'gabe_sim_files/{new_file_name}')
