@@ -5,6 +5,7 @@ from tqdm import tqdm
 import pickle
 import os 
 import warnings 
+from pymc.sampling import jax
 
 RANDOM_SEED = 58
 rng = np.random.default_rng(RANDOM_SEED)
@@ -94,7 +95,7 @@ def run_single_trial():
     data = sim_data(0) 
     logistic_regression_model = run_model(data)
     with logistic_regression_model:
-        idata = pm.sampling.jax.sample_numpyro_nuts(800, 200, cores=5, target_accept=0.65, progressbar=False)
+        idata = jax.sample_numpyro_nuts(800, 200, cores=5, target_accept=0.65, progressbar=False)
     next_dose = get_next_dose(idata)
     
     # We already went through 3 samples out of 36. 36 // 3 = 12 - 1 = 11
@@ -105,7 +106,7 @@ def run_single_trial():
         # run the model on all the data collected so far
         logistic_regression_model = run_model(data)
         with logistic_regression_model:
-            idata = pm.sampling.jax.sample_numpyro_nuts(800, 200, cores=5, target_accept=0.65, progressbar=False)
+            idata = jax.sample_numpyro_nuts(800, 200, cores=5, target_accept=0.65, progressbar=False)
         next_dose = get_next_dose(idata)
     
     beta0 = np.mean(idata.posterior['beta0'].values)
@@ -116,24 +117,24 @@ def run_single_trial():
     y_values = sigmoid(beta0 + beta1 * x_values)
     return data, y_values
 
-
-total_data = []
-sigmoid_probabilities = []
-# we should have 1000 simulations in total
-for sim in tqdm(range(500)):
-    data, trial_probabilities = run_single_trial()
-    total_data.append(data)    
-    sigmoid_probabilities.append(trial_probabilities)
-    
-# save the sigmoid probabilities to a pickle file
-with open(pickle_file_name, "wb") as f: # "wb" because we want to write in binary mode
-    pickle.dump(sigmoid_probabilities, f)
-    
-    
-for i in range(len(total_data)):
-    # add a column that tracks which simulation run is associated with each row
-    total_data[i]['sim_run'] = i
-    
-# combine list of dataframes to one dataframe
-total_data = pd.concat(total_data) 
-total_data.to_parquet(f'gabe_sim_files/{parquet_file_name}')
+if __name__ == "__main__":
+    total_data = []
+    sigmoid_probabilities = []
+    # we should have 1000 simulations in total
+    for sim in tqdm(range(500)):
+        data, trial_probabilities = run_single_trial()
+        total_data.append(data)    
+        sigmoid_probabilities.append(trial_probabilities)
+        
+    # save the sigmoid probabilities to a pickle file
+    with open(pickle_file_name, "wb") as f: # "wb" because we want to write in binary mode
+        pickle.dump(sigmoid_probabilities, f)
+        
+        
+    for i in range(len(total_data)):
+        # add a column that tracks which simulation run is associated with each row
+        total_data[i]['sim_run'] = i
+        
+    # combine list of dataframes to one dataframe
+    total_data = pd.concat(total_data) 
+    total_data.to_parquet(f'gabe_sim_files/{parquet_file_name}')
