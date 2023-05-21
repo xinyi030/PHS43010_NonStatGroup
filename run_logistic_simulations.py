@@ -4,8 +4,11 @@ import pymc as pm
 from tqdm import tqdm
 import pickle
 import os 
+import warnings 
+
 RANDOM_SEED = 58
 rng = np.random.default_rng(RANDOM_SEED)
+warnings.filterwarnings("ignore")
 
 doses = [0.5, 1, 3, 5, 6] # From figure 6 and in units (mg/m^2 per day)
 # true_toxic_prob = (0.25, 0.3, 0.5, 0.6, 0.7) # Given by assignment instructions, scenario 1
@@ -120,7 +123,7 @@ for sim in tqdm(range(500)):
     sigmoid_probabilities.append(trial_probabilities)
     
 # save the sigmoid probabilities to a pickle file
-with open("S2_sigmoid_probs_pt5.pkl", "wb") as f: # "wb" because we want to write in binary mode
+with open("S2_sigmoid_probs.pkl", "wb") as f: # "wb" because we want to write in binary mode
     pickle.dump(sigmoid_probabilities, f)
     
     
@@ -134,5 +137,6 @@ total_data = pd.concat(total_data)
 # update a new file name based on the files already available
 rel_files = [file.startswith("finished_simulations_") for file in os.listdir("gabe_sim_files")]
 new_index = int(max("finished_simulations_pt1.parquet"[23])) + 1
-new_file_name = f"S2_finished_simulations_pt{str(new_index)}.parquet"
+
+new_file_name = "S2_finished_simulations.parquet"
 total_data.to_parquet(f'gabe_sim_files/{new_file_name}')
