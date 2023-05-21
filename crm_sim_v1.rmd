@@ -1,0 +1,216 @@
+---
+title: "Simulation"
+author: "Bowei Kang"
+date: "5/19/2023"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dfcrm)
+library(ggplot2)
+```
+
+# simulation study based on Figure 6
+
+```{r}
+dose = c(0.5, 1, 3, 5, 6)
+p_true_1 = c(0.25, 0.30, 0.50, 0.60, 0.70)
+p_true_2 = c(0.01, 0.05, 0.20, 0.30, 0.50)
+N = 36
+n_per_cohort = 3
+ncohort = N/n_per_cohort
+target = 0.33
+```
+
+# CRM 
+
+Start from the lowest level (level 1). No skipping. 
+In each batch, if prop.tox <= 1/6, upgrade; if 1/6 < prop.tox <= 1/3, keep; if prop.tox > 1/3, downgrade
+
+## functions
+
+```{r}
+single_run = function(N, n_per_cohort, target, p_true, p.tox0, dose, plt = F) {
+ncohort = N/n_per_cohort
+path = matrix(NA, nrow = N, ncol = 4)
+colnames(path) = c('patient', 'levels', 'y', 'batches')
+path[, 'patient'] = 1:N
+for (i in 1:ncohort) {
+if (i == 1) {
+level_current = 1
+batch_current = 1
+}
+path[((i-1)*3+1):(i*3), 'levels']  = level_current
+path[((i-1)*3+1):(i*3), 'batches'] = batch_current
+path[((i-1)*3+1):(i*3), 'y'] = rbinom(n_per_cohort, 1, p_true[level_current])
+ids_cur_batch = which(path[, 'batches'] == batch_current)
+prop_tox_cur_batch = mean(path[ids_cur_batch, 'y'])
+level_update = determine_next_dose(level_current, prop_tox_cur_batch, length(p_true))
+if (level_update != level_current) batch_current = batch_current + 1
+level_current = level_update
+} # end for
+# bayesian estimate using logistic model
+est = crm(p.tox0, target, path[,'y'], path[, 'levels'], model = 'logistic')
+mtd = dose[which.min(abs(est$ptox - target))]
+if (plt) pp = plt_func(path, est, target, mtd, p_true, dose) else pp = NULL
+return(list(path = path, alpha_hat = est$ptox, mtd = mtd, plt = pp))
+}
+
+determine_next_dose = function(level_current, prop_tox_cur_batch, level_max) {
+level_new = 1
+if (level_current == 1) {
+if (prop_tox_cur_batch <=1/6) level_new = 2 
+}
+if (level_current == level_max) {
+if (prop_tox_cur_batch <=1/3) level_new = level_max else level_new = level_current - 1
+}
+if (level_current %in% 2:(level_max-1)) {
+if (prop_tox_cur_batch <=1/6) level_new = level_current + 1
+if (prop_tox_cur_batch > 1/6 & prop_tox_cur_batch <=1/3) level_new = level_current 
+if (prop_tox_cur_batch > 1/3) level_new = level_current - 1
+} 
+return(level_new)
+}
+
+plt_func = function(path, est, target, mtd, p_true, dose) {
+p1 = ggplot(data.frame(path), aes(patient, levels, col = as.factor(y))) + geom_point() + theme_bw() + ylim(0,length(dose) + 1) 
+tbl = data.frame(x = dose, p = est$ptox, lb = est$ptoxL, ub = est$ptoxU, ptrue = p_true)
+p2 = ggplot(tbl) + geom_line(aes(x, p)) + geom_point(aes(x, p), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) 
+p2 = p2 + geom_line(aes(x, ub), linetype = 2) + geom_point(aes(x, ub), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) + geom_line(aes(x, lb), linetype = 2) + geom_point(aes(x, lb), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) 
+p2 = p2 + geom_line(aes(x, ptrue), col = 'blue') + geom_point(aes(x, ptrue), shape = 22, colour = "blue", fill = "white", size = 2, stroke = 1) 
+p2 = p2 + geom_hline(yintercept = target, col = 'red', linetype = 2, linewidth = 0.8) 
+p2 = p2 + geom_vline(xintercept = mtd, col = 'green4', linetype = 3, linewidth = 1)
+p2 = p2 + scale_x_continuous(breaks = dose) + labs(title = '', x = 'Dose', y = 'Probability of DLT')
+p2 = p2 + theme_bw() 
+return(p1 + p2)
+}
+```
+
+## test a single trial
+
+```{r}
+set.seed(1)
+res = single_run_3(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_1, p.tox0 = p_true_1, dose = dose, plt = T)
+res
+```
+
+## multiple runs - case 1
+
+```{r}
+set.seed(1)
+niter = 1000
+res1 = replicate(niter, single_run_3(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_1, p.tox0 = p_true_1, dose = dose, plt = FALSE))
+# visit frequency
+vf1 = sapply(res1[1,], function(t) {
+summary = NULL
+for (i in 1:length(dose)) summary = c(summary, sum(t[, 'levels'] == i))
+return(summary)
+})
+rowSums(vf1) / (niter * N)
+# mtd
+table(unlist(res1[3,])) / niter
+p_true_1
+```
+
+57% visits level 1 (dose = 0.5), 55% sample trials recommends mtd at level 2 (dose = 1)
+
+## multiple runs - case 2
+
+```{r}
+set.seed(1)
+niter = 1000
+res2 = replicate(niter, single_run_3(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_2, p.tox0 = p_true_1, dose = dose, plt = FALSE))
+# visit frequency
+vf2 = sapply(res2[1,], function(t) {
+summary = NULL
+for (i in 1:length(dose)) summary = c(summary, sum(t[, 'levels'] == i))
+return(summary)
+})
+rowSums(vf2) / (niter * N)
+# mtd
+table(unlist(res2[3,])) / niter
+p_true_2
+```
+
+31% and 33% visits level 3, 4 (dose = 3, 5), 62% sample trials recommends mtd at level 4 (dose = 5)
+
+## visit frequency
+
+Visit frequency of case 2 is more spread-out, which leads to a better performance.
+
+```{r}
+df_bar = data.frame(level = rep(1:length(dose), 2), prop = c(rowSums(vf1), rowSums(vf2)) / (niter * N), case = rep(c('case1', 'case2'), c(length(dose), length(dose))))
+ggplot(df_bar, aes(x = level, y = prop, fill = case)) + geom_bar(stat = "identity", position = position_dodge()) + theme_bw()
+```
+
+
+# Improve CRM by adding extra lower levels
+
+Add extra levels (level 1/4, 1/3, 1/2) lower than the suggested lowest level (level 1, dose = 0.5)
+Start from new lowest level (level 1/4). No skipping. 
+In each batch, if prop.tox <= 1/6, upgrade; if 1/6 < prop.tox <= 1/3, keep; if prop.tox > 1/3, downgrade.
+
+## test a single trial
+
+```{r}
+dose_extd = c(0.5/4, 0.5/3, 0.5/2, 0.5, 1, 3, 5, 6)
+p_true_1_extd = c(0.1, 0.15, 0.2, 0.25, 0.3, 0.5, 0.6, 0.7)
+p_true_2_extd = c(0.001, 0.004, 0.007, 0.01, 0.05, 0.2, 0.3, 0.5)
+set.seed(1)
+res = single_run_3(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_1_extd, p.tox0 = p_true_1_extd, dose = dose_extd, plt = T)
+res
+```
+
+## multiple runs - case 1
+
+```{r}
+set.seed(1)
+niter = 1000
+res1 = replicate(niter, single_run_3(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_1_extd, p.tox0 = p_true_1_extd, dose = dose_extd, plt = FALSE))
+# visit frequency
+vf1 = sapply(res1[1,], function(t) {
+summary = NULL
+for (i in 1:length(dose_extd)) summary = c(summary, sum(t[, 'levels'] == i))
+return(summary)
+})
+rowSums(vf1) / (niter * N)
+# mtd
+table(unlist(res1[3,])) / niter
+p_true_1_extd
+```
+
+About 20% visits level 2,3,4 (dose = 0.5/3, 0.5/2, 0.5), most (56%) sample trails recommends mtd at level 4 (dose = 1)
+
+## multiple runs - case 2
+
+```{r}
+set.seed(1)
+niter = 1000
+res2 = replicate(niter, single_run_3(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_2_extd, p.tox0 = p_true_2_extd, dose = dose_extd, plt = FALSE))
+# visit frequency
+vf2 = sapply(res2[1,], function(t) {
+summary = NULL
+for (i in 1:length(dose_extd)) summary = c(summary, sum(t[, 'levels'] == i))
+return(summary)
+})
+rowSums(vf2) / (niter * N)
+# mtd
+table(unlist(res2[3,])) / niter
+p_true_2_extd
+```
+
+most visits level 6, 7 (dose = 3, 5), 57% sample trials recommends mtd at level 7 (dose = 5)
+
+## visit frequency
+
+Both spread out. The performance difference is mitigated. 56% vs 57%. Standard CRM - 55% vs 62%.
+
+```{r}
+df_bar = data.frame(level = rep(1:length(dose_extd), 2), prop = c(rowSums(vf1), rowSums(vf2)) / (niter * N), case = rep(c('case1', 'case2'), c(length(dose_extd), length(dose_extd))))
+ggplot(df_bar, aes(x = level, y = prop, fill = case)) + geom_bar(stat = "identity", position = position_dodge()) + theme_bw()
+```
+
