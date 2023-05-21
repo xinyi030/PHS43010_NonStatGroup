@@ -39,7 +39,7 @@ for sim in tqdm(range(500)):
     sigmoid_probabilities.append(trial_probabilities)
     
 # save the sigmoid probabilities to a pickle file
-with open(pickle_file_name, "wb") as f: # "wb" because we want to write in binary mode
+with open(f"gabe_sim_files/{pickle_file_name}", "wb") as f: # "wb" because we want to write in binary mode
     pickle.dump(sigmoid_probabilities, f)
     
     

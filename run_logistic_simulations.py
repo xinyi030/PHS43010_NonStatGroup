@@ -1,9 +1,6 @@
 import numpy as np
 import pandas as pd
 import pymc as pm
-from tqdm import tqdm
-import pickle
-import os 
 import warnings 
 from pymc.sampling import jax
 
@@ -53,14 +50,15 @@ def run_model(data):
     with pm.Model() as logistic_regression_model:
         x = pm.ConstantData("doses", data['doses'].values)
         # priors
-        beta0 = pm.Normal("beta0", mu=-3, sigma=2) # Made up by myself
-        beta1 = pm.Exponential("beta1", lam=1) # given from the paper
+        beta0 = pm.Normal("beta0", mu=-3, sigma=1) # Made up by myself
+        beta1 = pm.Exponential("beta1", lam=2) # given from the paper
         # linear model
         mu = beta0 + beta1 * x
         # probabilities
         # p = pm.Deterministic("p", pm.math.sigmoid(mu))
         # likelihood
-        y_obs = pm.Bernoulli("y", logit_p=pm.math.sigmoid(mu), observed=data['toxicity_event'].values) 
+        # y_obs = pm.Bernoulli("y", logit_p=pm.math.sigmoid(mu), observed=data['toxicity_event'].values) 
+        y_obs = pm.Logistic("y", mu=mu, observed=data['toxicity_event'].values) 
     return logistic_regression_model
     
     
