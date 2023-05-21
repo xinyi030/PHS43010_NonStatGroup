@@ -121,7 +121,6 @@ for (i in 1:length(est$sdose)){
 }
 
 
-
 return(list(mtd = mtd, path = path, target = target, p_true = p_true, dose = dose, 
             lb = lb, ub = ub, tox_post = tox_post))
   
