@@ -11,12 +11,14 @@ RANDOM_SEED = 58
 rng = np.random.default_rng(RANDOM_SEED)
 warnings.filterwarnings("ignore")
 
-parquet_file_name = "S2_finished_simulations.parquet"
-pickle_file_name = "S2_sigmoid_probs.pkl"
+# parquet_file_name = "S2_finished_simulations.parquet"
+parquet_file_name = "test.parquet"
+pickle_file_name = "test.pkl"
+# pickle_file_name = "S2_sigmoid_probs.pkl"
 
-doses = [0.5, 1, 3, 5, 6] # From figure 6 and in units (mg/m^2 per day)
-# true_toxic_prob = (0.25, 0.3, 0.5, 0.6, 0.7) # Given by assignment instructions, scenario 1
-true_toxic_prob = (0.01, 0.05, 0.2, 0.3, 0.5) # Given by assignment instructions, scenario 2
+doses = np.array([0.5, 1, 3, 5, 6]) # From figure 6 and in units (mg/m^2 per day)
+true_toxic_prob = (0.25, 0.3, 0.5, 0.6, 0.7) # Given by assignment instructions, scenario 1
+# true_toxic_prob = (0.01, 0.05, 0.2, 0.3, 0.5) # Given by assignment instructions, scenario 2
 
 def sigmoid(x):
   return 1 / (1 + np.exp(-x))
@@ -48,18 +50,17 @@ def run_model(data):
     Returns:
         pymc model: Fitted model based on priors and the current data collected
     """
-    coords = {"observation": data.index.values} 
-    with pm.Model(coords=coords) as logistic_regression_model:
-        x = pm.ConstantData("doses", data['doses'].values, dims="observation")
+    with pm.Model() as logistic_regression_model:
+        x = pm.ConstantData("doses", data['doses'].values)
         # priors
         beta0 = pm.Normal("beta0", mu=-3, sigma=2) # Made up by myself
         beta1 = pm.Exponential("beta1", lam=1) # given from the paper
         # linear model
         mu = beta0 + beta1 * x
         # probabilities
-        p = pm.Deterministic("p", sigmoid(mu), dims="observation")
+        # p = pm.Deterministic("p", pm.math.sigmoid(mu))
         # likelihood
-        y_obs = pm.Bernoulli("y", logit_p=mu, observed=data['toxicity_event'].values, dims="observation") 
+        y_obs = pm.Bernoulli("y", logit_p=pm.math.sigmoid(mu), observed=data['toxicity_event'].values) 
     return logistic_regression_model
     
     
@@ -95,7 +96,7 @@ def run_single_trial():
     data = sim_data(0) 
     logistic_regression_model = run_model(data)
     with logistic_regression_model:
-        idata = jax.sample_numpyro_nuts(800, 200, cores=5, target_accept=0.65, progressbar=False)
+        idata = jax.sample_numpyro_nuts(800, 300, cores=5, target_accept=0.70, progressbar=False)
     next_dose = get_next_dose(idata)
     
     # We already went through 3 samples out of 36. 36 // 3 = 12 - 1 = 11
@@ -106,15 +107,13 @@ def run_single_trial():
         # run the model on all the data collected so far
         logistic_regression_model = run_model(data)
         with logistic_regression_model:
-            idata = jax.sample_numpyro_nuts(800, 200, cores=5, target_accept=0.65, progressbar=False)
+            idata = jax.sample_numpyro_nuts(800, 300, cores=5, target_accept=0.70, progressbar=False)
         next_dose = get_next_dose(idata)
     
     beta0 = np.mean(idata.posterior['beta0'].values)
     beta1 = np.mean(idata.posterior['beta1'].values)
-    # store the doses in a numpy array
-    x_values = np.array(doses)
     # Generate y values (sigmoid probabilities)
-    y_values = sigmoid(beta0 + beta1 * x_values)
+    y_values = sigmoid(beta0 + beta1 * doses)
     return data, y_values
 
 if __name__ == "__main__":
