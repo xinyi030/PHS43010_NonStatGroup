@@ -16,9 +16,9 @@ nsims <- 1000
 target.tox <- 1/3
 mu <- c(1, 1)
 Sigma <- rbind(c(0.84^2, 0.134), c(0.134, 0.80^2))
-bcrm.sim <- bcrm(stop=list(nmax=36), dose=dose, ff="logit2", p.tox0=p.tox0
+bcrm.sim <- bcrm(stop=list(nmax=36), dose=dose, ff="logit2", p.tox0=truep1
 , prior.alpha=list(4, mu, Sigma), target.tox=target.tox, constrain=TRUE, pointest="mean", 
-start=1, simulate=TRUE, nsims=nsims, truep=truep2, method="rjags", sdose.calculate = "median")
+start=1, simulate=TRUE, nsims=nsims, truep=truep1, method="rjags", sdose.calculate = "median")
 
 # define a two-parameter logistic function
 logit2 <- function(x, alpha, beta) {
