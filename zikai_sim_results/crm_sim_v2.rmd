@@ -91,21 +91,26 @@ single_run <-  function(N, n_per_cohort, target, p_true, p.tox0, dose, plt = F) 
 
 # assume normal priors for params. mu = 0, sd = 1 for both. independent
 est <- bcrm(stop=list(nmax=18), data=path, sdose = dose,
-            ff="logit2", prior.alpha=list(4, c(0, 0), rbind(c(1, 0), c(0, 1))), 
+            ff="logit2", prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))), 
             target.tox=target, constrain=F, sdose.calculate="median", 
             pointest="mean", method = 'rjags')
 
 mcmc_post_params <- Posterior.rjags(tox = est$tox, notox = est$notox, 
                                 sdose = est$sdose, ff = "logit2", 
                                 prior.alpha = est$prior.alpha, 
-                                burnin.itr = 2000, production.itr = 2000)
+                                burnin.itr = 2000, production.itr = 5000)
 
 alpha_post_mean<- mean(mcmc_post_params[,1])
 beta_post_mean <- mean(mcmc_post_params[,2])
+# alpha_post_sd<- sd(mcmc_post_params[,1])
+# beta_post_sd <- sd(mcmc_post_params[,2])
+
 tox_post <- (exp(log(alpha_post_mean)+beta_post_mean*est$sdose)/
                (1+exp(log(alpha_post_mean)+beta_post_mean*est$sdose)))
+
 selector <- which.min(abs(tox_post - target))
 mtd <- dose[selector]
+
 
 lb <- rep(0, 5)
 ub <- rep(0, 5)
