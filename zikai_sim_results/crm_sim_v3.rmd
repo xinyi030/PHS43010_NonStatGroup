@@ -36,25 +36,25 @@ In each batch, if prop.tox <= 1/6, upgrade; if 1/6 < prop.tox <= 1/3, keep; if p
 ## functions
 
 ```{r}
-determine_next_dose = function(level_current, prop_tox_cur_batch, level_max) {
-  level_new = 1
-  if (level_current == 1) {
-    if (prop_tox_cur_batch <=1/6) level_new = 2 
-  }
-  if (level_current == level_max) {
-    if (prop_tox_cur_batch <=1/3) {
-      level_new = level_max }
-      else level_new = level_current - 1
-  }
-  if (level_current %in% 2:(level_max-1)) {
-    if (prop_tox_cur_batch <=1/6) level_new = level_current + 1
-    if (prop_tox_cur_batch > 1/6 & prop_tox_cur_batch <=1/3) {
-      level_new = level_current
-    }
-    if (prop_tox_cur_batch > 1/3) level_new = level_current - 1
-  } 
-  return(level_new)
-}
+# determine_next_dose = function(level_current, prop_tox_cur_batch, level_max) {
+#   level_new = 1
+#   if (level_current == 1) {
+#     if (prop_tox_cur_batch <=1/6) level_new = 2 
+#   }
+#   if (level_current == level_max) {
+#     if (prop_tox_cur_batch <=1/3) {
+#       level_new = level_max }
+#       else level_new = level_current - 1
+#   }
+#   if (level_current %in% 2:(level_max-1)) {
+#     if (prop_tox_cur_batch <=1/6) level_new = level_current + 1
+#     if (prop_tox_cur_batch > 1/6 & prop_tox_cur_batch <=1/3) {
+#       level_new = level_current
+#     }
+#     if (prop_tox_cur_batch > 1/3) level_new = level_current - 1
+#   } 
+#   return(level_new)
+# }
 
 
 single_run <-  function(N, n_per_cohort, target, p_true, dose, plt = F) {
@@ -72,10 +72,16 @@ single_run <-  function(N, n_per_cohort, target, p_true, dose, plt = F) {
     path[((i-1)*3+1):(i*3), 'batches'] = batch_current
     path[((i-1)*3+1):(i*3), 'tox'] = rbinom(n_per_cohort, 1, p_true[level_current])
 
-    ids_cur_batch = which(path[, 'batches'] == batch_current)
-    prop_tox_cur_batch = mean(path[ids_cur_batch, 'tox'])
-    level_update = determine_next_dose(level_current, prop_tox_cur_batch, 
-                                       length(p_true))
+    ids_batch_sofar = which(path[, 'batches'] %in% 1:batch_current)
+    level_update = bcrm(stop=list(nmax=length(ids_batch_sofar)), 
+                        data=path[ids_batch_sofar,], sdose = dose,
+            ff="logit2", prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))),
+            target.tox=target, constrain=F, sdose.calculate="mean",
+            pointest="mean", method = 'rjags')$ndose[[1]][1]
+    level_update= as.numeric(level_update)
+    # prop_tox_cur_batch = mean(path[ids_cur_batch, 'tox'])
+    # level_update = determine_next_dose(level_current, prop_tox_cur_batch, 
+    #                                    length(p_true))
     
     if (level_update != level_current) {
       batch_current = batch_current + 1
@@ -160,7 +166,7 @@ return(p1 + p2)
 ## test a single trial
 
 ```{r}
-set.seed(1)
+set.seed(5)
 res = single_run(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_1, 
                  dose = dose, plt = F)
 res
@@ -200,7 +206,7 @@ plt1 <- unnest(res2, path) %>%
   geom_bar(aes(y = (..count..)/sum(..count..))) +
   ylab("Proportion")+
   xlab("Dose level")+
-  ggtitle("Case2: Proportion of patients assigned to each level")+
+  ggtitle("Case1: Proportion of patients assigned to each level")+
   theme_bw()
 
 plt1
