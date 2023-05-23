@@ -20,6 +20,7 @@ library(HDInterval)
 
 ```{r}
 dose = c(0.5, 1, 3, 5, 6)
+p.tox0 <- c(0.05, 0.10, 0.15, 0.33,0.50) 
 p_true_1 = c(0.25, 0.30, 0.50, 0.60, 0.70)
 p_true_2 = c(0.01, 0.05, 0.20, 0.30, 0.50)
 N = 36
@@ -74,7 +75,7 @@ single_run <-  function(N, n_per_cohort, target, p_true, dose, plt = F) {
 
     ids_batch_sofar = which(path[, 'batches'] %in% 1:batch_current)
     level_update = bcrm(stop=list(nmax=length(ids_batch_sofar)), 
-                        data=path[ids_batch_sofar,], sdose = dose,
+                        data=path[ids_batch_sofar,], dose = dose, p.tox0 = p.tox0,
             ff="logit2", prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))),
             target.tox=target, constrain=F, sdose.calculate="mean",
             pointest="mean", method = 'rjags')$ndose[[1]][1]
@@ -97,7 +98,7 @@ single_run <-  function(N, n_per_cohort, target, p_true, dose, plt = F) {
 
 
 # assume normal priors for params. mu = 0, sd = 1 for both. independent
-est <- bcrm(stop=list(nmax=36), data=path, sdose = dose,
+est <- bcrm(stop=list(nmax=36), data=path, dose = dose,p.tox0 = p.tox0,
             ff="logit2", prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))),
             target.tox=target, constrain=F, sdose.calculate="mean",
             pointest="mean", method = 'rjags')
