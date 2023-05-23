@@ -431,10 +431,17 @@ single_run &lt;-  function(N, n_per_cohort, target, p_true, dose, plt = F) {
 
 
 # assume normal priors for params. mu = 0, sd = 1 for both. independent
-est &lt;- bcrm(stop=list(nmax=18), data=path, sdose = dose,
+est &lt;- bcrm(stop=list(nmax=36), data=path, sdose = dose,
             ff=&quot;logit2&quot;, prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))), 
-            target.tox=target, constrain=F, sdose.calculate=&quot;median&quot;, 
+            target.tox=target, constrain=F, sdose.calculate=&quot;mean&quot;, 
             pointest=&quot;mean&quot;, method = &#39;rjags&#39;)
+
+# est &lt;- bcrm(stop=list(nmax=36), data=path, sdose = dose,
+#             ff=&quot;logit2&quot;, prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))), 
+#             target.tox=target, constrain=F, sdose.calculate=&quot;mean&quot;, 
+#             simulate = T, nsims = 1, truep = p_true, pointest=&quot;mean&quot;, 
+#             method = &#39;rjags&#39;)
+
 
 mcmc_post_params &lt;- Posterior.rjags(tox = est$tox, notox = est$notox, 
                                 sdose = est$sdose, ff = &quot;logit2&quot;, 
