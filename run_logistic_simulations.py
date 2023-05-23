@@ -21,7 +21,7 @@ def sigmoid(x):
   return 1 / (1 + np.exp(-x))
 
 
-def sim_data(relevant_index):
+def sim_data(relevant_index, true_toxic_prob=true_toxic_prob):
     """ Simulates whether any of the 3 participants have a toxicity event given by the unknown probabilities.
 
     Args:
