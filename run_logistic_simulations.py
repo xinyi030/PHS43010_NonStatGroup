@@ -8,20 +8,18 @@ RANDOM_SEED = 58
 rng = np.random.default_rng(RANDOM_SEED)
 warnings.filterwarnings("ignore")
 
-# parquet_file_name = "S2_finished_simulations.parquet"
 parquet_file_name = "test.parquet"
 pickle_file_name = "test.pkl"
+# parquet_file_name = "S2_finished_simulations.parquet"
 # pickle_file_name = "S2_sigmoid_probs.pkl"
 
 doses = np.array([0.5, 1, 3, 5, 6]) # From figure 6 and in units (mg/m^2 per day)
-true_toxic_prob = (0.25, 0.3, 0.5, 0.6, 0.7) # Given by assignment instructions, scenario 1
-# true_toxic_prob = (0.01, 0.05, 0.2, 0.3, 0.5) # Given by assignment instructions, scenario 2
 
 def sigmoid(x):
   return 1 / (1 + np.exp(-x))
 
 
-def sim_data(relevant_index, true_toxic_prob=true_toxic_prob):
+def sim_data(relevant_index, true_toxic_prob):
     """ Simulates whether any of the 3 participants have a toxicity event given by the unknown probabilities.
 
     Args:
