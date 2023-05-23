@@ -8,11 +8,6 @@ RANDOM_SEED = 58
 rng = np.random.default_rng(RANDOM_SEED)
 warnings.filterwarnings("ignore")
 
-parquet_file_name = "test.parquet"
-pickle_file_name = "test.pkl"
-# parquet_file_name = "S2_finished_simulations.parquet"
-# pickle_file_name = "S2_sigmoid_probs.pkl"
-
 doses = np.array([0.5, 1, 3, 5, 6]) # From figure 6 and in units (mg/m^2 per day)
 
 def sigmoid(x):
