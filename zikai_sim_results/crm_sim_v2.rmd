@@ -57,9 +57,9 @@ determine_next_dose = function(level_current, prop_tox_cur_batch, level_max) {
 }
 
 
-single_run <-  function(N, n_per_cohort, target, p_true, p.tox0, dose, plt = F) {
+single_run <-  function(N, n_per_cohort, target, p_true, dose, plt = F) {
   ncohort = N/n_per_cohort
-  path <- data.frame(patient = 1:N, dose = NA, tox = NA, batches = NA)
+  path <- data.frame(patient = 1:N, dose = NA, tox = NA, batches = NA, sdose = NA)
 
   for (i in 1:ncohort) {
     if (i == 1) {
@@ -68,6 +68,7 @@ single_run <-  function(N, n_per_cohort, target, p_true, p.tox0, dose, plt = F) 
     }
     
     path[((i-1)*3+1):(i*3), 'dose']  = level_current
+    path[((i-1)*3+1):(i*3), 'sdose']  = dose[level_current]
     path[((i-1)*3+1):(i*3), 'batches'] = batch_current
     path[((i-1)*3+1):(i*3), 'tox'] = rbinom(n_per_cohort, 1, p_true[level_current])
 
@@ -150,7 +151,7 @@ return(p1 + p2)
 
 ```{r}
 set.seed(1)
-res = single_run(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_1, p.tox0 = p_true_1, dose = dose, plt = F)
+res = single_run(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_1, dose = dose, plt = F)
 res
 ```
 
@@ -160,7 +161,7 @@ res
 set.seed(1)
 niter = 1000
 res1 = replicate(niter, single_run(N = 36, n_per_cohort = 3, target = 0.33, 
-                                   p_true = p_true_1, p.tox0 = p_true_1, 
+                                   p_true = p_true_1, 
                                    dose = dose, plt = FALSE))
 
 res2 <- data.frame(t(res1)) %>% rename(dose_level = dose)
@@ -173,7 +174,7 @@ dose_avg <- unnest(res2, path) %>%
 print("Percent of patients assigned to each dose over all trials")
 print(dose_avg)
 # mtd
-print("Percentage of simulated trials recommending dose as MTD")
+print("Proportion of simulated trials recommending dose as MTD")
 table(unlist(res1[1,])) / niter
 print("True p's")
 p_true_1
@@ -184,19 +185,24 @@ p_true_1
 
 ```{r}
 plt1 <- unnest(res2, path) %>% 
-  ggplot(mapping = aes(x = dose)) +
+  ggplot(mapping = aes(x = as.character(sdose))) +
   geom_bar(aes(y = (..count..)/sum(..count..))) +
-  ylab("Percentage")+
+  ylab("Proportion")+
+  xlab("Dose level")+
+  ggtitle("Case2: Proportion of patients assigned to each level")+
   theme_bw()
-plt1
-ggsave('Case1_Percentage of patients assigned to each level.png', plt1)
 
-plt2 <- ggplot(mapping = aes(x = 1:5, y = c(table(unlist(res1[1,])) / niter,0)))+
-  geom_bar(stat = 'identity')+
-  ylab("Percentage")+
+plt1
+ggsave('Case1_Proportion of patients assigned to each level.png', plt1)
+
+plt2 <- res2 %>% ggplot(mapping = aes(x = as.character(mtd)))+
+  geom_bar(aes(y = (..count..)/sum(..count..)))+
+  ylab("Proportion")+
+    xlab("Dose")+
+    ggtitle("Case1: Proportion of trials recommending each dose level.png")+
   theme_bw()  
 plt2
-ggsave('Case1_Percentage of trials recommending each dose level.png', plt2)
+ggsave('Case1_Proportion of trials recommending each dose level.png', plt2)
 ```
 
 
@@ -206,7 +212,7 @@ ggsave('Case1_Percentage of trials recommending each dose level.png', plt2)
 set.seed(1)
 niter = 1000
 res3 = replicate(niter, single_run(N = 36, n_per_cohort = 3, target = 0.33, 
-                                   p_true = p_true_1, p.tox0 = p_true_2, 
+                                   p_true = p_true_2,  
                                    dose = dose, plt = FALSE))
 
 res4 <- data.frame(t(res3)) %>% rename(dose_level = dose)
@@ -219,7 +225,7 @@ dose_avg2 <- unnest(res4, path) %>%
 print("Percent of patients assigned to each dose over all trials")
 print(dose_avg2)
 # mtd
-print("Percentage of simulated trials recommending dose as MTD")
+print("Proportion of simulated trials recommending dose as MTD")
 table(unlist(res3[1,])) / niter
 print("True p's")
 p_true_2
@@ -228,18 +234,22 @@ p_true_2
 
 ```{r}
 plt3 <- unnest(res4, path) %>% 
-  ggplot(mapping = aes(x = dose)) +
+  ggplot(mapping = aes(x = as.character(sdose))) +
   geom_bar(aes(y = (..count..)/sum(..count..))) +
-  ylab("Percentage")+
+  ylab("Proportion")+
+  xlab("Dose level")+
+  ggtitle("Case2: Proportion of patients assigned to each level")+
   theme_bw()
 plt3
-ggsave('Case2_Percentage of patients assigned to each level.png', plt3)
+ggsave('Case2_Proportion of patients assigned to each level.png', plt3)
 
-plt4 <- ggplot(mapping = aes(x = 1:5, y = c(table(unlist(res3[1,])) / niter)))+
-  geom_bar(stat = 'identity')+
-  ylab("Percentage")+
+plt4 <- res4 %>% ggplot(mapping = aes(x = as.character(mtd)))+
+  geom_bar(aes(y = (..count..)/sum(..count..)))+
+  ylab("Proportion")+
+    xlab("Dose level")+
+    ggtitle("Case2: Proportion of trials recommending each dose level.png")+
   theme_bw()  
 plt4
-ggsave('Case2_Percentage of trials recommending each dose level.png', plt4)
+ggsave('Case2_Proportion of trials recommending each dose level.png', plt4)
 ```
 
