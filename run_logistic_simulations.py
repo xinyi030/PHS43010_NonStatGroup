@@ -23,7 +23,7 @@ def sim_data(relevant_index, true_toxic_prob):
     Returns:
         Pandas Dataframe: Contains the doses the three participants took and whether each participant had a toxicity event
     """
-    toxicity_observation = np.random.binomial(1, p=true_toxic_prob[relevant_index], size=3) # 3 samples per cohort
+    toxicity_observation = rng.binomial(1, p=true_toxic_prob[relevant_index], size=3) # 3 samples per cohort
     doses_observed = np.ones(3) * doses[relevant_index] # doses given to the three participants
     # store data in a dataframe that will later be concatenated to make one dataframe
     data = pd.DataFrame({'doses':doses_observed, 'toxicity_event': toxicity_observation})
