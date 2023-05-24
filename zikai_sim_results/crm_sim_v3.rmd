@@ -20,6 +20,13 @@ library(HDInterval)
 
 ```{r}
 dose = c(0.5, 1, 3, 5, 6)
+dose_actual = dose
+
+tox.cutpoints <- c(0.2, 0.35, 0.6)
+## Losses associated with toxicity intervals 
+## [0, 0.2]=1,  (0.2, 0.35]=0,  (0.35, 0.6]=1,  (0.6, 1]=2
+loss <- c(1, 0, 1, 2)
+
 p.tox0 <- c(0.05, 0.10, 0.15, 0.33,0.50) 
 p_true_1 = c(0.25, 0.30, 0.50, 0.60, 0.70)
 p_true_2 = c(0.01, 0.05, 0.20, 0.30, 0.50)
@@ -69,7 +76,7 @@ single_run <-  function(N, n_per_cohort, target, p_true, dose, plt = F) {
     }
     
     path[((i-1)*3+1):(i*3), 'dose']  = level_current
-    path[((i-1)*3+1):(i*3), 'sdose']  = dose[level_current]
+    # path[((i-1)*3+1):(i*3), 'sdose']  = dose[level_current]
     path[((i-1)*3+1):(i*3), 'batches'] = batch_current
     path[((i-1)*3+1):(i*3), 'tox'] = rbinom(n_per_cohort, 1, p_true[level_current])
 
@@ -77,8 +84,11 @@ single_run <-  function(N, n_per_cohort, target, p_true, dose, plt = F) {
     level_update = bcrm(stop=list(nmax=length(ids_batch_sofar)), 
                         data=path[ids_batch_sofar,], dose = dose, p.tox0 = p.tox0,
             ff="logit2", prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))),
-            target.tox=target, constrain=F, sdose.calculate="mean",
-            pointest="mean", method = 'rjags')$ndose[[1]][1]
+            target.tox=target, constrain=F, 
+            #sdose.calculate="mean", 
+            tox.cutpoints = tox.cutpoints, loss = loss,
+            #pointest="mean", 
+            method = 'rjags')$ndose[[1]][1]
     level_update= as.numeric(level_update)
     # prop_tox_cur_batch = mean(path[ids_cur_batch, 'tox'])
     # level_update = determine_next_dose(level_current, prop_tox_cur_batch, 
@@ -97,11 +107,16 @@ single_run <-  function(N, n_per_cohort, target, p_true, dose, plt = F) {
 #             dose = dose))
 
 
+mu <- c(2.15, 0.52)
+Sigma <- rbind(c(0.84^2, 0.134), c(0.134, 0.80^2))  
+  
 # assume normal priors for params. mu = 0, sd = 1 for both. independent
 est <- bcrm(stop=list(nmax=36), data=path, dose = dose,p.tox0 = p.tox0,
-            ff="logit2", prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))),
-            target.tox=target, constrain=F, sdose.calculate="mean",
-            pointest="mean", method = 'rjags')
+            ff="logit2", prior.alpha=list(4, mu, Sigma),
+            target.tox=target, constrain=F, 
+            tox.cutpoints = tox.cutpoints, loss = loss,
+            #sdose.calculate="mean", pointest="mean", 
+            method = 'rjags')
 
 # est <- bcrm(stop=list(nmax=36), data=path, sdose = dose,
 #             ff="logit2", prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))),
@@ -112,10 +127,7 @@ est <- bcrm(stop=list(nmax=36), data=path, dose = dose,p.tox0 = p.tox0,
 
 mcmc_post_params <- Posterior.rjags(tox = est$tox, notox = est$notox, 
                                 sdose = est$sdose, ff = "logit2", 
-                                prior.alpha = list(4, 
-                                                               c(1, 1), 
-                                                               rbind(c(1, 0), 
-                                                                     c(0, 1))), 
+                                prior.alpha = list(4,mu, Sigma), 
                                 burnin.itr = 2000, production.itr = 5000)
 
 alpha_post_mean<- mean(mcmc_post_params[,1])
@@ -203,7 +215,7 @@ p_true_1
 
 ```{r}
 plt1 <- unnest(res2, path) %>% 
-  ggplot(mapping = aes(x = as.character(sdose))) +
+  ggplot(mapping = aes(x = as.character(dose_actual[(dose)]))) +
   geom_bar(aes(y = (..count..)/sum(..count..))) +
   ylab("Proportion")+
   xlab("Dose level")+
@@ -221,6 +233,12 @@ plt2 <- res2 %>% ggplot(mapping = aes(x = as.character(mtd)))+
   theme_bw()  
 plt2
 ggsave('Case1_Proportion of trials recommending each dose level.png', plt2)
+
+res2 %>% group_by(as.character(mtd)) %>% 
+  summarize(count = (n())) %>% 
+  mutate(Proportion = count/sum(count)) %>% 
+  select(-count)
+
 ```
 
 
@@ -252,7 +270,7 @@ p_true_2
 
 ```{r}
 plt3 <- unnest(res4, path) %>% 
-  ggplot(mapping = aes(x = as.character(sdose))) +
+  ggplot(mapping = aes(x = as.character(dose_actual[(dose)]))) +
   geom_bar(aes(y = (..count..)/sum(..count..))) +
   ylab("Proportion")+
   xlab("Dose level")+
@@ -269,5 +287,11 @@ plt4 <- res4 %>% ggplot(mapping = aes(x = as.character(mtd)))+
   theme_bw()  
 plt4
 ggsave('Case2_Proportion of trials recommending each dose level.png', plt4)
+
+res4 %>% group_by(as.character(mtd)) %>% 
+  summarize(count = (n())) %>% 
+  mutate(Proportion = count/sum(count)) %>% 
+  select(-count)
+
 ```
 
