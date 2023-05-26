@@ -1,0 +1,29 @@
+---
+title: "Bayes risk"
+author: "Zikai Li"
+date: "2023-05-26"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The standard dose recommendation rule in the use of the CRM relies on point estimates of the posterior probability of a dose-limiting toxicity (DLT) at each dose level. According to this rule, the next cohort is treated at the dose with the closest mean or median posterior probability of DLT to the specified target probability, 33% in our case. This rule is simple and easy to implement. However, it disregards the uncertainty associated with the point estimates of the posterior probabilities, which can usually be substantial given the small sample sizes. 
+
+An alternative is to use Bayes risk for posterior probability intervals associated with each dose as the inferential summary (Neuenschwander, Branson and Gsponer, 2008). We first define Bayes risk values for each of the following intervals:
+
+\begin{aligned*}
+L(\theta, d)= \begin{cases}\ell_1=1 & \text { if } \pi_\theta(d) \in(0,0.31] \\
+\ell_2=0 & \text { if } \pi_\theta(d) \in(0.31,0.35] \\
+\ell_3=1 & \text { if } \pi_\theta(d) \in(0.35,0.6] \\
+\ell_4=2 & \text { if } \pi_\theta(d) \in(0.6,1]\end{cases}
+\end{aligned*}
+
+After each cohort of patients has gone through the trial, we estimate the posterior distributions of toxicity for each dose level, $\pi_\theta(d)$. The Bayes risk of each dose level is calculated as follows:
+$\ell_1 P\left\{\pi_\theta(d) \in\right.\right. \left.(0,0.31]\}+\ell_2 P\left\{\pi_\theta(d) \in(0.31,0.35]\right\}+\ell_3 P\left\{\pi_\theta(d) \in(0.35,0.6]\right\}+\ell_4 P\left\{\pi_\theta(d) \in(0.6,1]\right\}$
+
+After each cohort has gone through the trial, data is pooled for calculating the Bayes risk for each dose level. The dose level with the lowest Bayes risk is recommended as the dose level for the next cohort. The trial terminates when all 36 patients get treated and the MTD is determined basded on the overall Bayes risk of each dose level. 
+
+
+ 

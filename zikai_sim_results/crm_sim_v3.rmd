@@ -18,14 +18,16 @@ library(HDInterval)
 
 # simulation study based on Figure 6
 
+This code uses Bayesian decision theory in conjunction with Bayesian logistic regressions. 
+
 ```{r}
 dose = c(0.5, 1, 3, 5, 6)
 dose_actual = dose
 
-tox.cutpoints <- c(0.2, 0.35, 0.6)
+
 ## Losses associated with toxicity intervals 
 ## [0, 0.2]=1,  (0.2, 0.35]=0,  (0.35, 0.6]=1,  (0.6, 1]=2
-loss <- c(1, 0, 1, 2)
+
 
 p.tox0 <- c(0.05, 0.10, 0.15, 0.33,0.50) 
 p_true_1 = c(0.25, 0.30, 0.50, 0.60, 0.70)
@@ -65,7 +67,8 @@ In each batch, if prop.tox <= 1/6, upgrade; if 1/6 < prop.tox <= 1/3, keep; if p
 # }
 
 
-single_run <-  function(N, n_per_cohort, target, p_true, dose, plt = F) {
+single_run <-  function(N, n_per_cohort, target, p_true, dose, plt = F,
+                        loss = c(1, 0, 1, 2),tox.cutpoints = c(0.30, 0.36, 0.6)) {
   ncohort = N/n_per_cohort
   path <- data.frame(patient = 1:N, dose = NA, tox = NA, batches = NA, sdose = NA)
 
@@ -107,7 +110,7 @@ single_run <-  function(N, n_per_cohort, target, p_true, dose, plt = F) {
 #             dose = dose))
 
 
-mu <- c(2.15, 0.52)
+mu <- c(1, 0)
 Sigma <- rbind(c(0.84^2, 0.134), c(0.134, 0.80^2))  
   
 # assume normal priors for params. mu = 0, sd = 1 for both. independent
@@ -138,7 +141,8 @@ beta_post_mean <- mean(mcmc_post_params[,2])
 tox_post <- (exp(log(alpha_post_mean)+beta_post_mean*est$sdose)/
                (1+exp(log(alpha_post_mean)+beta_post_mean*est$sdose)))
 
-selector <- which.min(abs(tox_post - target))
+# selector <- which.min(abs(tox_post - target))
+selector <- as.numeric(est$ndose[[1]][1])
 mtd <- dose[selector]
 
 
@@ -179,7 +183,7 @@ return(p1 + p2)
 ## test a single trial
 
 ```{r}
-set.seed(5)
+set.seed(60654)
 res = single_run(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_1, 
                  dose = dose, plt = F)
 res
@@ -217,6 +221,7 @@ p_true_1
 plt1 <- unnest(res2, path) %>% 
   ggplot(mapping = aes(x = as.character(dose_actual[(dose)]))) +
   geom_bar(aes(y = (..count..)/sum(..count..))) +
+  ylim(c(0, 0.8))+
   ylab("Proportion")+
   xlab("Dose level")+
   ggtitle("Case1: Proportion of patients assigned to each level")+
@@ -227,9 +232,10 @@ ggsave('Case1_Proportion of patients assigned to each level.png', plt1)
 
 plt2 <- res2 %>% ggplot(mapping = aes(x = as.character(mtd)))+
   geom_bar(aes(y = (..count..)/sum(..count..)))+
+  ylim(c(0, 0.8))+
   ylab("Proportion")+
     xlab("Dose")+
-    ggtitle("Case1: Proportion of trials recommending each dose level.png")+
+    ggtitle("Case1: Proportion of trials recommending each dose level")+
   theme_bw()  
 plt2
 ggsave('Case1_Proportion of trials recommending each dose level.png', plt2)
@@ -272,6 +278,7 @@ p_true_2
 plt3 <- unnest(res4, path) %>% 
   ggplot(mapping = aes(x = as.character(dose_actual[(dose)]))) +
   geom_bar(aes(y = (..count..)/sum(..count..))) +
+  ylim(c(0, 0.7))+
   ylab("Proportion")+
   xlab("Dose level")+
   ggtitle("Case2: Proportion of patients assigned to each level")+
@@ -281,9 +288,10 @@ ggsave('Case2_Proportion of patients assigned to each level.png', plt3)
 
 plt4 <- res4 %>% ggplot(mapping = aes(x = as.character(mtd)))+
   geom_bar(aes(y = (..count..)/sum(..count..)))+
+  ylim(c(0, 0.7))+
   ylab("Proportion")+
     xlab("Dose level")+
-    ggtitle("Case2: Proportion of trials recommending each dose level.png")+
+    ggtitle("Case2: Proportion of trials recommending each dose level")+
   theme_bw()  
 plt4
 ggsave('Case2_Proportion of trials recommending each dose level.png', plt4)
