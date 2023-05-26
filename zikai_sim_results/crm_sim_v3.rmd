@@ -1,0 +1,305 @@
+---
+title: "Simulation"
+author: "Bowei Kang; Zikai Li"
+date: "2023-05-20"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo = F, message=F}
+library(dfcrm)
+library(bcrm)
+library(ggplot2)
+library(tidyverse)
+library(HDInterval)
+```
+
+# simulation study based on Figure 6
+
+This code uses Bayesian decision theory in conjunction with Bayesian logistic regressions. 
+
+```{r}
+dose = c(0.5, 1, 3, 5, 6)
+dose_actual = dose
+
+
+## Losses associated with toxicity intervals 
+## [0, 0.2]=1,  (0.2, 0.35]=0,  (0.35, 0.6]=1,  (0.6, 1]=2
+
+
+p.tox0 <- c(0.05, 0.10, 0.15, 0.33,0.50) 
+p_true_1 = c(0.25, 0.30, 0.50, 0.60, 0.70)
+p_true_2 = c(0.01, 0.05, 0.20, 0.30, 0.50)
+N = 36
+n_per_cohort = 3
+ncohort = N/n_per_cohort
+target = 0.33
+```
+
+# CRM 
+
+Start from the lowest level (level 1). No skipping. 
+In each batch, if prop.tox <= 1/6, upgrade; if 1/6 < prop.tox <= 1/3, keep; if prop.tox > 1/3, downgrade
+
+## functions
+
+```{r}
+# determine_next_dose = function(level_current, prop_tox_cur_batch, level_max) {
+#   level_new = 1
+#   if (level_current == 1) {
+#     if (prop_tox_cur_batch <=1/6) level_new = 2 
+#   }
+#   if (level_current == level_max) {
+#     if (prop_tox_cur_batch <=1/3) {
+#       level_new = level_max }
+#       else level_new = level_current - 1
+#   }
+#   if (level_current %in% 2:(level_max-1)) {
+#     if (prop_tox_cur_batch <=1/6) level_new = level_current + 1
+#     if (prop_tox_cur_batch > 1/6 & prop_tox_cur_batch <=1/3) {
+#       level_new = level_current
+#     }
+#     if (prop_tox_cur_batch > 1/3) level_new = level_current - 1
+#   } 
+#   return(level_new)
+# }
+
+
+single_run <-  function(N, n_per_cohort, target, p_true, dose, plt = F,
+                        loss = c(1, 0, 1, 2),tox.cutpoints = c(0.30, 0.36, 0.6)) {
+  ncohort = N/n_per_cohort
+  path <- data.frame(patient = 1:N, dose = NA, tox = NA, batches = NA, sdose = NA)
+
+  for (i in 1:ncohort) {
+    if (i == 1) {
+      level_current = 1
+      batch_current = 1
+    }
+    
+    path[((i-1)*3+1):(i*3), 'dose']  = level_current
+    # path[((i-1)*3+1):(i*3), 'sdose']  = dose[level_current]
+    path[((i-1)*3+1):(i*3), 'batches'] = batch_current
+    path[((i-1)*3+1):(i*3), 'tox'] = rbinom(n_per_cohort, 1, p_true[level_current])
+
+    ids_batch_sofar = which(path[, 'batches'] %in% 1:batch_current)
+    level_update = bcrm(stop=list(nmax=length(ids_batch_sofar)), 
+                        data=path[ids_batch_sofar,], dose = dose, p.tox0 = p.tox0,
+            ff="logit2", prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))),
+            target.tox=target, constrain=F, 
+            #sdose.calculate="mean", 
+            tox.cutpoints = tox.cutpoints, loss = loss,
+            #pointest="mean", 
+            method = 'rjags')$ndose[[1]][1]
+    level_update= as.numeric(level_update)
+    # prop_tox_cur_batch = mean(path[ids_cur_batch, 'tox'])
+    # level_update = determine_next_dose(level_current, prop_tox_cur_batch, 
+    #                                    length(p_true))
+    
+    if (level_update != level_current) {
+      batch_current = batch_current + 1
+      level_current = level_update}
+} # end for
+  
+# bayesian estimate using logistic model
+# est = crm(p.tox0, target, path[,'y'], path[, 'levels'], model = 'logistic2')
+# mtd = dose[which.min(abs(est$ptox - target))]
+# if (plt) pp = plt_func(path, est, target, mtd, p_true, dose) else pp = NULL
+# return(list(path = path, est = est, target = target, mtd = mtd, p_true = p_true, 
+#             dose = dose))
+
+
+mu <- c(1, 0)
+Sigma <- rbind(c(0.84^2, 0.134), c(0.134, 0.80^2))  
+  
+# assume normal priors for params. mu = 0, sd = 1 for both. independent
+est <- bcrm(stop=list(nmax=36), data=path, dose = dose,p.tox0 = p.tox0,
+            ff="logit2", prior.alpha=list(4, mu, Sigma),
+            target.tox=target, constrain=F, 
+            tox.cutpoints = tox.cutpoints, loss = loss,
+            #sdose.calculate="mean", pointest="mean", 
+            method = 'rjags')
+
+# est <- bcrm(stop=list(nmax=36), data=path, sdose = dose,
+#             ff="logit2", prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))),
+#             target.tox=target, constrain=F, sdose.calculate="mean",
+#             simulate = T, nsims = 1, truep = p_true, pointest="mean",
+#             method = 'rjags')
+
+
+mcmc_post_params <- Posterior.rjags(tox = est$tox, notox = est$notox, 
+                                sdose = est$sdose, ff = "logit2", 
+                                prior.alpha = list(4,mu, Sigma), 
+                                burnin.itr = 2000, production.itr = 5000)
+
+alpha_post_mean<- mean(mcmc_post_params[,1])
+beta_post_mean <- mean(mcmc_post_params[,2])
+# alpha_post_sd<- sd(mcmc_post_params[,1])
+# beta_post_sd <- sd(mcmc_post_params[,2])
+
+tox_post <- (exp(log(alpha_post_mean)+beta_post_mean*est$sdose)/
+               (1+exp(log(alpha_post_mean)+beta_post_mean*est$sdose)))
+
+# selector <- which.min(abs(tox_post - target))
+selector <- as.numeric(est$ndose[[1]][1])
+mtd <- dose[selector]
+
+
+lb <- rep(0, 5)
+ub <- rep(0, 5)
+
+for (i in 1:length(est$sdose)){
+  s <-  est$sdose[i]
+  tox_post_all <- (exp(log(mcmc_post_params[,1])+mcmc_post_params[,2]*s)/
+               (1+exp(log(mcmc_post_params[,1])+mcmc_post_params[,2]*s)))
+  hdi <- hdi(tox_post_all, prob = 0.95)
+  
+  lb[i] = hdi[1]
+  ub[i] = hdi[2]
+
+}
+
+
+return(list(mtd = mtd, path = path, target = target, p_true = p_true, dose = dose, 
+            lb = lb, ub = ub, tox_post = tox_post))
+  
+}
+
+plt_func = function(path, est, target, mtd, p_true, dose) {
+p1 = ggplot(data.frame(path), aes(patient, dose, col = as.factor(tox))) + geom_point() + theme_bw() + ylim(0,length(dose) + 1) 
+tbl = data.frame(x = dose, p = est$ptox, lb = est$ptoxL, ub = est$ptoxU, ptrue = p_true)
+p2 = ggplot(tbl) + geom_line(aes(x, p)) + geom_point(aes(x, p), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) 
+p2 = p2 + geom_line(aes(x, ub), linetype = 2) + geom_point(aes(x, ub), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) + geom_line(aes(x, lb), linetype = 2) + geom_point(aes(x, lb), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) 
+p2 = p2 + geom_line(aes(x, ptrue), col = 'blue') + geom_point(aes(x, ptrue), shape = 22, colour = "blue", fill = "white", size = 2, stroke = 1) 
+p2 = p2 + geom_hline(yintercept = target, col = 'red', linetype = 2, linewidth = 0.8) 
+p2 = p2 + geom_vline(xintercept = mtd, col = 'green4', linetype = 3, linewidth = 1)
+p2 = p2 + scale_x_continuous(breaks = dose) + labs(title = '', x = 'Dose', y = 'Probability of DLT')
+p2 = p2 + theme_bw() 
+return(p1 + p2)
+}
+```
+
+## test a single trial
+
+```{r}
+set.seed(60654)
+res = single_run(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_1, 
+                 dose = dose, plt = F)
+res
+```
+
+## multiple runs - case 1
+
+```{r warning=F, message=F}
+set.seed(1)
+niter = 1000
+res1 = replicate(niter, single_run(N = 36, n_per_cohort = 3, target = 0.33, 
+                                   p_true = p_true_1, 
+                                   dose = dose, plt = FALSE))
+
+res2 <- data.frame(t(res1)) %>% rename(dose_level = dose)
+
+
+dose_avg <- unnest(res2, path) %>% 
+  select(dose) %>% 
+  table()/(36*niter)
+
+print("Percent of patients assigned to each dose over all trials")
+print(dose_avg)
+# mtd
+print("Proportion of simulated trials recommending dose as MTD")
+table(unlist(res1[1,])) / niter
+print("True p's")
+p_true_1
+```
+
+
+
+
+```{r}
+plt1 <- unnest(res2, path) %>% 
+  ggplot(mapping = aes(x = as.character(dose_actual[(dose)]))) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  ylim(c(0, 0.8))+
+  ylab("Proportion")+
+  xlab("Dose level")+
+  ggtitle("Case1: Proportion of patients assigned to each level")+
+  theme_bw()
+
+plt1
+ggsave('Case1_Proportion of patients assigned to each level.png', plt1)
+
+plt2 <- res2 %>% ggplot(mapping = aes(x = as.character(mtd)))+
+  geom_bar(aes(y = (..count..)/sum(..count..)))+
+  ylim(c(0, 0.8))+
+  ylab("Proportion")+
+    xlab("Dose")+
+    ggtitle("Case1: Proportion of trials recommending each dose level")+
+  theme_bw()  
+plt2
+ggsave('Case1_Proportion of trials recommending each dose level.png', plt2)
+
+res2 %>% group_by(as.character(mtd)) %>% 
+  summarize(count = (n())) %>% 
+  mutate(Proportion = count/sum(count)) %>% 
+  select(-count)
+
+```
+
+
+## multiple runs - case 2
+
+```{r warning=F, message=F}
+set.seed(1)
+niter = 1000
+res3 = replicate(niter, single_run(N = 36, n_per_cohort = 3, target = 0.33, 
+                                   p_true = p_true_2,  
+                                   dose = dose, plt = FALSE))
+
+res4 <- data.frame(t(res3)) %>% rename(dose_level = dose)
+
+
+dose_avg2 <- unnest(res4, path) %>% 
+  select(dose) %>% 
+  table()/(36*niter)
+
+print("Percent of patients assigned to each dose over all trials")
+print(dose_avg2)
+# mtd
+print("Proportion of simulated trials recommending dose as MTD")
+table(unlist(res3[1,])) / niter
+print("True p's")
+p_true_2
+```
+
+
+```{r}
+plt3 <- unnest(res4, path) %>% 
+  ggplot(mapping = aes(x = as.character(dose_actual[(dose)]))) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  ylim(c(0, 0.7))+
+  ylab("Proportion")+
+  xlab("Dose level")+
+  ggtitle("Case2: Proportion of patients assigned to each level")+
+  theme_bw()
+plt3
+ggsave('Case2_Proportion of patients assigned to each level.png', plt3)
+
+plt4 <- res4 %>% ggplot(mapping = aes(x = as.character(mtd)))+
+  geom_bar(aes(y = (..count..)/sum(..count..)))+
+  ylim(c(0, 0.7))+
+  ylab("Proportion")+
+    xlab("Dose level")+
+    ggtitle("Case2: Proportion of trials recommending each dose level")+
+  theme_bw()  
+plt4
+ggsave('Case2_Proportion of trials recommending each dose level.png', plt4)
+
+res4 %>% group_by(as.character(mtd)) %>% 
+  summarize(count = (n())) %>% 
+  mutate(Proportion = count/sum(count)) %>% 
+  select(-count)
+
+```
+
