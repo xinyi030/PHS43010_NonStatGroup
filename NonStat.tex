@@ -1,0 +1,1112 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newlength{\cslentryspacingunit} % times entry-spacing
+\setlength{\cslentryspacingunit}{\parskip}
+\newenvironment{CSLReferences}[2] % #1 hanging-ident, #2 entry spacing
+ {% don't indent paragraphs
+  \setlength{\parindent}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+  \let\oldpar\par
+  \def\par{\hangindent=\cslhangindent\oldpar}
+  \fi
+  % set entry spacing
+  \setlength{\parskip}{#2\cslentryspacingunit}
+ }%
+ {}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, citecolor=blue, linkcolor=blue, urlcolor=blue}
+\usepackage{hyperref}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Final Project: Bayesian Inference Clinical Trials and Nonparametric Models},
+  pdfauthor={Non-stat Team: Captain: Xinyi Zhang, Members: \ldots{}},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Final Project: Bayesian Inference Clinical Trials and
+Nonparametric Models}
+\author{Non-stat Team: Captain: Xinyi Zhang, Members: \ldots{}}
+\date{2023-05-22}
+
+\begin{document}
+\maketitle
+
+\hypertarget{introduction-by-hongzhang-xie}{%
+\section{1. Introduction (by Hongzhang
+Xie)}\label{introduction-by-hongzhang-xie}}
+
+Phase I dose-finding clinical trials are conducted to analyze the safety
+and tolerability of a new drug. This is a critical step in drug
+development as it marks the first time the new drug is used in humans.
+The trials aim to determine the Maximum Tolerated Dose (MTD) and give a
+foundation for further drug development and clinical trials.
+
+Because we are not fully understood the actions and side effects of new
+drugs in the human body, there is a potential risk to the trial
+participants. Also, experimenting with new drugs at low doses level may
+delay patients' chances of treatment. On the other hand, Phase I trials
+typically require close health monitoring of participants, which
+requires substantial medical resources and specialized personnel.
+Therefore, considering ethical and cost factors, phase I dose-finding
+trials often have a small sample size, with each dose-level cohort
+comprising only around three participants.
+
+\hypertarget{why-frequency-is-not-suitable-for-phase-i-dose-finding-trials}{%
+\subsection{1.1 Why frequency is not suitable for phase I dose-finding
+trials?}\label{why-frequency-is-not-suitable-for-phase-i-dose-finding-trials}}
+
+The traditional frequency method presumes a fixed coefficient for the
+Dose Limiting Toxicity (DLT) distribution under the same dose level.
+Each sample point is an independent draw. Given a large enough sample
+size, the sampling mean will finally equal the actual coefficient.
+Hence, we can make a hypothesis test for finding the MTD (such as the
+assumption that DLT at a particular dose level smaller than 0.33). If we
+observe enough extreme data based on the null hypothesis, we can reject
+this hypothesis. However, as the frequency hypothesis test is based on
+the law of large numbers, there will be a huge variance in phase I
+dose-finding trials because of the small sample size. In such cases, the
+likelihood of a type II error (accepting an incorrect null hypothesis)
+would be very high. The results of the hypothesis test are not robust.
+
+On the other hand, in the process of drug research and development, we
+often have some prior information about the drug (such as the results of
+animal experiments). This information is of great help in determining
+the MTD. However, the frequency method cannot make good use of this
+information.
+
+Finally, the conclusion of the hypothesis test only rejected or failed
+to reject. Even if we reject the null hypothesis (e.g.~H0: DLT
+\textless{} TTL), the hypothesis test still says nothing to the H1. In
+other words, rejecting the null hypothesis (H0) just means that the
+probability of observing the current data is extremely small when H0 is
+true. It does not give us any evidence for H1 (e.g.~DLT \textgreater=
+TTL). We do not know the degree of confidence for DLT \textgreater= TTL.
+But in phase I dose-finding trials, clinicians need this information to
+decide the following trial strategy. Therefore, it is not suitable for
+the frequency method in phase I dose-finding trials.
+
+\hypertarget{traditional-33-method}{%
+\subsection{1.2 Traditional 3+3 method}\label{traditional-33-method}}
+
+Currently, traditional 3+3 method is the mainstream method for
+determining MTD in phase I dose-finding trials. By the literature review
+from Tongtong Jin, more than 90\% of phase I dose-finding trials use
+rule-based designs such as traditional 3+3.
+
+The 3+3 method is intuitive, easy to operate, and provides a clear and
+repeatable method to confirm the MTD, which can be more easily
+understood and accepted by clinical researchers, approval agencies, and
+ethics committees with non-statistical backgrounds. At the same time,
+the 3+3 method is cautious about increasing the dose level and has been
+tested by many previous studies, which shows that 3+3 has good safety.
+
+However, a large number of studies have pointed out that the 3+3 method
+also has some disadvantages.
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\item
+  The 3+3 method cannot efficiently utilize all the information in the
+  trials. The decision at each dose level depends only on the
+  information of the three (or six) experimental participants at the
+  current dose level. The 3+3 method does not consider the information
+  outside this dose level.
+\item
+  In the process of increasing the dose level, at least three subjects
+  are required for each dose level, and the clinicians should wait for
+  the result in the current dose level to make the decision to increase
+  the dose level. Even if the current results show that the preset
+  measurement increases too slowly, it is hard to adjust the dose level
+  during the experiment according to the new information. This may
+  expose more patients to ineffective low doses level treatment and may
+  also delay the overall trial period. (This also shows that the 3+3
+  method lacks flexibility).
+\item
+  When determining MTD, the percentage of DLT is fixed at 33\%. The TTR
+  (Target toxicity rate) cannot be set flexibly.
+\item
+  Unable to establish a dose-response curve: The 3+3 method can only
+  find a fixed MTD, but cannot build a model to show the relationship of
+  the toxicity in different dose rate.
+\end{enumerate}
+
+\hypertarget{crm-method}{%
+\subsection{1.3 CRM method}\label{crm-method}}
+
+After each trial in a certain dose level, CRM will update the model
+based on all the data (posterior) and then use this updated model to
+predict the toxicity risk of each dose level. Based on these results,
+the clinicians will decide on the next dose level and continue the trial
+until meeting the stopping rules. Compared with the traditional 3+3
+method, CRM has the following advantages:
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\item
+  Compared with 3+3 methods, CRM makes better use of all the data that
+  has been collected during the phase I dose-finding trials. In other
+  words, CRM is not only considered the information in the current dose
+  level (3+3) but also considers the DLT information of all previous
+  doses. So CRM can estimate MTD more accurately.
+\item
+  In the process of phase I dose-finding trials, CRM can easily adjust
+  the subsequent test design and dose level according to the existing
+  experimental information. Therefore, CRM can reduce the sample size
+  and time wasted during the low-dose level (or reduce the risk of
+  severe toxic reactions by reducing the dose level in the next trial),
+  thereby reducing the risk of patients' exposure to extremely high or
+  low dose levels (high DLT risk or the risk of delayed treatment).
+\item
+  CRM can analyze the complex relationship between dose and toxicity by
+  constructing different Dose-toxicity skeleton models and can adapt to
+  different situations by changing the model's parameters. For example,
+  suppose there are two drugs, the DLT probability of the first drug is
+  linearly related to the dose level. The DLT probability of the second
+  drug is extremely low at low dose levels, and the DLT probability
+  increases rapidly after a certain dose level. In the 3+3 method, the
+  strategies of the two drugs are exactly the same, while in the CRM, we
+  can use the power model for the first drug and the logistic model for
+  the second drug for a better fit of the model.
+\item
+  The CRM method uses the Bayesian method to construct a dose-response
+  curve, which can better reflect the relationship between toxicity and
+  dose, and can be used to estimate the MTD at any TTR level.
+\end{enumerate}
+
+\hypertarget{why-is-our-final-project-important}{%
+\subsection{1.4 Why is our final project
+important?}\label{why-is-our-final-project-important}}
+
+Although the continuous reassessment approach (CRM) has many advantages,
+it also has some potential disadvantages and limitations:
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\item
+  CRM is a relatively complicated method, and there is no mature SOP
+  (standard operating procedure). This means that the experiment needs a
+  statistical expert for inference and decision-making, and the model
+  may be too complex for the clinical team and the SMC (Safety
+  Monitoring Committee or Data and Safety Monitoring Board) member. This
+  has become one of the main barriers to the uptake of CRM methods in
+  phase I dose-finding trials.
+\item
+  The dose level in the CRM method increases rapidly under some models
+  (especially single-parameter models), which may increase the risk of
+  the number and severity of DLT while improving the efficiency of the
+  experiment. For this reason, some ad-hoc rules may be needed to
+  control the risk of overdose.
+\item
+  The implementation of CRM requires the clinical team to choose
+  appropriate models and parameters. Improper selection or setting may
+  affect the results of CRM. Especially in the early stages of the
+  trial, due to the lack of data, the results of CRM may have large
+  fluctuations in the different prior models.
+\end{enumerate}
+
+It should be noted that the development of a drug often has a large
+amount of research investment and potential marketing profits. Due to
+the high flexibility of CRM, the clinical team may modify the model base
+on their personal profits but not based on statistics and medical
+theory, even though this may put patients at a higher risk of DLT.
+Therefore, we need to further analyze the effect of models and
+parameters setting on CRM inference and then establish a complete SOP
+and avoid the problem of that events.
+
+In our final project, we first conducted a literature review on Wheeler
+et al.~l (2019) and twenty relevant studies. Subsequently, we use the
+R-studio to make simulations to find the difference between two
+scenarios with different true toxicity probabilities ((0.25, 0.3, 0.5,
+0.6, 0.7) vs (0.01, 0.05, 0.2, 0.3, 0.5)) on the estimated MTD in the
+CRM model. Finally, we discussed why this difference happens and how to
+avoid this problem.
+
+We believe that our final project research can help us better understand
+the impact of toxicity probabilities difference on the MTD results in
+the CRM model. This finding can help the clinical team estimate MTD more
+accurately and helps in making the mature SOP of CRM in phase I
+dose-finding trials.
+
+\newpage
+
+\hypertarget{literature-review}{%
+\section{2. Literature Review}\label{literature-review}}
+
+\hypertarget{crm-design-for-phase-1-dose-finding-trials-by-william}{%
+\subsection{2.1 CRM design for phase 1 dose-finding trials (By
+William)}\label{crm-design-for-phase-1-dose-finding-trials-by-william}}
+
+CRM is an alternative to the standard 3+3 design based on using a model
+like a one parameter or two parameter logistic model, to understand the
+maximum tolerated dose in a phase 1 trial. CRM is more accurate in
+choosing the MTD, is less likely to choose ineffective doses, treats
+fewer patients at overly toxic doses, and treats fewer patients at very
+low doses.(Garrett-Mayer 2006) Our paper plans to look at a
+two-parameter model. A two-parameter model is likely to better estimate
+the shape of the entire dose-toxicity relationship, (Chevret 1993) but
+less efficiently identify the MTD; it may take longer to reach the MTD
+since two parameters must be estimated, and there may be difficulties
+fitting the model or obtaining consistent estimates of model parameters.
+(Iasonos et al. 2016)
+
+The idea behind the CRM starts with a priori dose toxicity curve and a
+chosen target toxicity rate. This curve will be refit after every cohort
+(1-3 patients) toxicity outcome, is observed. At every new dose or same
+dose, the all-prior data is used to update the model/curve
+(Garrett-Mayer E). As required a discussion needs to take place with all
+relevant stakeholders. The target toxicity level is typically set
+between 20 to 25\% and can be as high as 40\%. (Brock et al. 2017;
+Møller 1995) In a review of 197 phase I trials published between 1997
+and 2008, the median number of dose levels explored was five (range
+2--12). (Penel and Kramar 2012)
+
+Inference or decisions can be made using a likelihood or Bayesian
+methods using the accruing trial data and clinical judgment. In a
+Bayesian method data from patients in the trial is used to update prior
+on the model distribution which then gives a posterior distribution for
+the model parameters and therefore posterior beliefs for the probability
+of DLT at each dose. These posterior probabilities are used to make dose
+escalation decisions. By assessing a design's operating characteristics
+with a specific prior in a variety of scenarios, the prior distribution
+can be recalibrated until the model makes recommendations for dose
+escalations and the MTD that the trial team are happy with (Wheeler et
+al. 2019).
+
+Possible decision rules include choosing the dose with an estimated
+probability of DLT closest to the TTL or, more conservatively, choosing
+the dose with an estimated probability of DLT closest to, but not
+greater than, the TTL. The first option allows quicker escalation
+towards the true MTD but may expose more patients to overdoses. The
+second option reduces the chance of overdosing patients, but may take
+longer to escalate towards the true MTD (Wheeler et al. 2019)
+
+Samples sizes are determined by the study and how and where its being
+conducted. Specifying a lower bound based on Cheung's work and practical
+upper bound in trial protocols. Kuen Cheung (2013) proposed formulae
+that use a target average percentage of correctly selecting the MTD
+(say, 50\% of the time) to obtain a lower bound for the trial sample
+size (Wheeler,M Graham). Although CRM designs, like standard ones, can
+halt after only 10--14 subjects, it is typically necessary to plan for
+at least 18--24 total subjects, after which the probability of a correct
+MTD choice rises slowly with sample size (Garrett-Mayer 2006)
+
+Cohort size at each dose level typically is more than 1. A cohort size
+of one allows better understanding of operating characteristics but this
+is rarely used. (Garrett-Mayer 2006) There could be regulatory
+constraints. If cohort size is greater than 2, then a monitoring plan is
+needed.
+
+Stopping rules for the trial include the following examples. Early
+termination can be considered if the MTD is judged to be outside the
+planned set of doses. Adding additional patients is unlikely to yield
+information that would change the current MTD estimate. Fixed no of
+patients has been consecutively dosed at one dose level. Estimated
+probability of all dose levels having a DLT rate about the TTL is at
+least 90\%. The probability that the next m patients to be dose in the
+trial will be given the same dose levels, regardless of DLT outcomes
+observed, exceed some level (Wheeler et al. 2019).
+
+\hypertarget{summary-for-references}{%
+\subsection{2.2 Summary for references}\label{summary-for-references}}
+
+\hypertarget{references-1-5-by-tongtong-jin}{%
+\subsubsection{2.2.1 References 1-5 (by Tongtong
+Jin)}\label{references-1-5-by-tongtong-jin}}
+
+\hypertarget{phase-1-trial-and-maximum-tolerated-dose-mtd}{%
+\paragraph{Phase 1 trial and maximum tolerated dose
+(MTD)}\label{phase-1-trial-and-maximum-tolerated-dose-mtd}}
+
+The phase 1 trials in oncology are usually designed to obtain the
+optimal dose of a new treatment for efficacy testing in subsequent phase
+2 trials. For cytotoxic agents, the probability of treatment benefit is
+presumed to be positively proportional to the dose in a certain range of
+consideration. Thus, the optimal dose in phase 1 trial is usually
+considered as the highest dose at a tolerable level of toxicity. And the
+optimal dose we are seeking for is exactly the maximum tolerated dose
+(MTD).
+
+To define MTD in a more rigorous way, it is the dose expected to produce
+some degree of medically unacceptable, dose limiting toxicity (DLT) in a
+specified proportion \(\theta\) of patients. Namely,
+
+\[Prob(DLT | Dose = MTD) = \theta,\] where the proportion \(\theta\) is
+also defined as the target toxicity level (TTL) (Babb and Rogatko 2004;
+Cater 1972).
+
+\hypertarget{dose-escalation-methods-in-phase-1-trials}{%
+\paragraph{Dose escalation methods in phase 1
+trials}\label{dose-escalation-methods-in-phase-1-trials}}
+
+To find the MTD we defined above, in clinical testing we adopt dose
+escalation methods, which is based on the prior belief that the toxicity
+increases monotonically with increasing dose. The principle of dose
+escalation in phase 1 trials is both maintaining the toxicity at a safe
+level and the information accumulation at a rapid speed and at the same
+time avoid patients being exposed to subtherapeutic doses as much as
+possible.
+
+Dose escalation methods can be mainly classified in two branches,
+rule-based designs such as traditional 3+3 design and model-based
+designs such as continual reassessment method. Rule-based designs don't
+make any assumptions for the function of toxicity with respect to dose
+level. And the next step of dose is purely dependent on the information
+from the last dose. Then finally terminates at some certain stopping
+criteria. But model-based designs assume there's a specific function
+between dose and toxicity, usually power functions, logistic functions
+etc., and then apply accumulated information from every dose to
+determine the next dose.
+
+From the perspective of practical use, rule-based designs like
+traditional 3+3 are easier to implement, but model-based designs need
+biostatistical expertise and available software on site to perform
+real-time model fitting. As for the information utilization, rule-based
+designs only use current information, but model-based designs make use
+of all toxicity information accumulated during the trial, which can be
+more comprehensive. In the aspect of the exposure to subtherapeutic
+doses, model-based designs relatively treat fewer patients at suboptimal
+doses than rule-based ones. Hence according to the principle of dose
+escalation methods, the model-based designs usually do better in rapid
+information accumulation and reducing excessive exposure to
+subtherapeutic doses.(Le Tourneau, Lee, and Siu 2009).
+
+\hypertarget{current-popularity-of-rule-based-designs-and-model-based-designs-in-phase-1-trials}{%
+\paragraph{Current popularity of rule-based designs and model-based
+designs in phase 1
+trials}\label{current-popularity-of-rule-based-designs-and-model-based-designs-in-phase-1-trials}}
+
+Although the model-based designs show great advantages in many aspects,
+rule-based designs like the 3+3 design are still more prevailingly used,
+and model-based designs are rarely used. Some statistical results about
+the popularity of these two types of methods in phase 1 trials are as
+follows.
+
+Rogatko et al. (2007) examined through the records of cancer phase 1
+trial from the Science Citation Index database from 1991 to 2006 and
+divided them into two sets (dose-finding trials and methodologic studies
+of dose-escalation designs). Then track among these two sets which
+trials adopted new statistical designs. As a result, only 1.6\% trials
+follow one of the methodologic studies and show extensive lags on
+publication time. The rest of the trials all follow the traditional
+up-and-down method (a type of rule-based method).
+
+Chiuzan et al. (2017) studied the degree of adoption of the methods with
+new trial designs on early phase trials of molecularly targeted agents
+(MTA) and immunotherapies. It searched papers published from 2008 to
+2014 about phase 1 oncology trials and found that in dose-finding
+trials, 92.9\% of them utilized rule-based designs and 5.4\% used
+model-based designs or other novel designs. Particularly, among the MTA
+and immunotherapies trials, 5.8\% used model-based designs. The results
+show that the adoption of model-based designs and novel designs remains
+low.
+
+Above phenomenon could be caused by limited time and effort of
+clinicians and statisticians and the lack of comprehensive and detailed
+tutorials and instructions for the newly designed approaches.(Rogatko et
+al. 2007; Chiuzan et al. 2017).
+
+\hypertarget{references-6-10-by-yiwei-ding}{%
+\subsubsection{2.2.2 References 6-10 (by Yiwei
+Ding)}\label{references-6-10-by-yiwei-ding}}
+
+\hypertarget{reference-6}{%
+\paragraph{Reference 6:}\label{reference-6}}
+
+O'Quigley and Zohar (2006)
+
+For the atistical design of dose-finding studies, the standard design is
+a `memoryless' design and it's not so satisfying. This paper describes
+designs with memory and we discuss how these designs are superior to
+memoryless designs. The most well-known design with memory is the
+continual reassessment method (CRM).
+
+\hypertarget{reference-7}{%
+\paragraph{Reference 7:}\label{reference-7}}
+
+Harrington et al. (2013)
+
+Carrying out dual-agent phase I trials for medications is crucial. There
+are predominantly two kinds of dose-escalation trials: rule-based and
+model-based. Trials based on models are progressively adjusted with the
+help of Bayesian techniques, which merge preliminary data concerning the
+dose-toxicity relationship. Studies using simulations indicate that
+model-driven designs tend to treat a greater proportion of patients at
+near-optimal dose levels.
+
+\hypertarget{reference-8}{%
+\paragraph{Reference 8:}\label{reference-8}}
+
+Adaptive Designs Working Group of the MRC Network of Hubs for Trials
+Methodology Research (2017)
+
+This paper summarize why modelbased designs such as the continual
+reassessment method (CRM) are more available than 3+3 and similar
+rulebased A+B designs. Compared with rule-based designs, Modelbased
+designs can clearly define and can flexibly choose target DLT rate; many
+patients can be treated at the optimal dose; few patients can be treated
+at subtherapeutic doses; the utilization of available data is efficient;
+extension to more complex questions is smooth \& straightforward;
+deviations from the plan are easily accommodated.
+
+\hypertarget{reference-9}{%
+\paragraph{Reference 9:}\label{reference-9}}
+
+Jaki, Clive, and Weir (2013)
+
+There are three classes of dose-escalation trial design: gorithmic
+approaches (including the popular 3+3 design), Bayesian model-based
+designs and Bayesian curve-free methods. The main benefit of algorithmic
+approaches is the simplicity. Model-based and curve-free Bayesian
+approaches are more preferable because they are more able to identify
+the dose with the desired toxicity rate and allocate a greater
+proportion of patient. For statistical and practical reasons, Bayesian
+model-based or curve-free approach is better. If there is sufficient
+evidence of high enough quality from previous studies, the model-based
+approach will be better, otherwise curve-free one is better.
+
+\hypertarget{reference-10}{%
+\paragraph{Reference 10:}\label{reference-10}}
+
+O'Quigley, Pepe, and Fisher (1990)
+
+For the design and analysis of Phase I clinical trails in cancer,
+attention focuses rather on identifying a dose with a given targeted
+level is the best estimate of this level. Such sequential designs is
+called continual reassessment method (CRM). In the procedure, we update
+our notion of the dose-reponse relationship. From the simulations, this
+method is good.
+
+\hypertarget{references-11-15-by-ujjwal-sehrawat}{%
+\subsubsection{2.2.3 References 11-15 (by Ujjwal
+Sehrawat)}\label{references-11-15-by-ujjwal-sehrawat}}
+
+Clinicians are interested in phase 1 dose finding designs that can
+estimate the MTD using fewer patients with a fixed number of doses, or
+can test more dose levels for a given sample size. Several studies have
+compared CRM to the traditional SM (3+3 standard method that escalates
+doses after 3 patients with an option for an additional 3 patients; also
+called traditional method TM or the ``up-and-down scheme) {[}D*{]} and
+found that CRM is more likely to recommend the correct MTD and dose more
+trial patients close to the MTD. (O'Quigley 1999; Thall and Lee 2003;
+Iasonos et al. 2008; Onar, Kocak, and Boyett 2009; Onar-Thomas and Xiong
+2010) We expound on some of these prior works below.
+
+O'Quigley (1999) in response to Korn et al. (1994)'s findings about
+CRM's slower time duration and poorer safety standards relative to SM
+concluded that, indeed, CRM does not take longer than SM when the
+comparison fairly accounts for comparable grouping inclusions and that
+CRM is, indeed, safer for a randomly chosen patient than SM as per
+simulation results that show that the probability of being treated at
+very high toxic levels is almost always higher with SM than CRM.
+Furthermore, O'Quigley et al.~argued that if treating patients at
+unacceptably low sub-therapeutic levels is considered part of the safety
+definition, then CRM also performs much better than SM. Unlike SM, it is
+entirely straightforward to adjust CRM to make it safe as we require.
+All it requires is to change the target level, say from 0.2 to 0.1. In
+this case, the observed number of toxicities will be, on average,
+roughly halved. One of the main advantages of CRM, O'Quigley et
+al.~argued, is its flexibility and ability to be adapted to potentially
+different situations unlike SM which is rigid, samples independently of
+any targeted percentile, and has no convergence properties. (O'Quigley
+1999)
+
+Thall and Lee (2003) described and compared 2 practical outcome-adaptive
+statistical methods for dose finding in phase 1 clinical trials: CRM and
+a logistic regression model-based method. Both methods used Bayesian
+probability models as a basis for learning from the accruing data during
+the trial, choosing doses for successive patient cohorts, and selecting
+an MTD. These methods were illustrated and compared to the SM by
+application to a particular trial in renal cell carcinoma. The paper
+compared average behavior by computer simulation under each of several
+hypothetical dose-toxicity curves. The comparisons showed that the
+Bayesian methods are much more reliable than the conventional algorithms
+for selecting an MTD, and that they have a low risk of treating patients
+at unacceptably toxic doses. (Thall and Lee 2003)
+
+Iasonos et al. (2008) compared several CRM-based methods with SM. For
+comparison, variations were given to the number of dose levels (5 to 8)
+and the location of the true MTD. Only CRM with constraint in dose
+escalation was evaluated since it is more likely to be used by
+clinicians as the O'Quigley et al.'s original CRM (O'Quigley, Pepe, and
+Fisher 1990) allows skipping dose levels in the absence of DLT's,
+potentially unnecessarily exposing patients to highly toxic drug levels
+which makes clinicians uncomfortable. Furthermore, 3 CRM-based methods
+that combine rule-based and model-based approaches were evaluated. They
+found that CRM and SM are comparable in terms of how fast they reach the
+MTD as well as the total sample size needed when testing a limited
+number of dose levels (\(\leq\) 5), however, as the number of dose
+levels was increased, CRM reached the MTD in fewer patients when used
+with a fixed sample of 20 patients. However, a sample size of 20---25
+patients is not sufficient to achieve a narrow precision around the
+estimated toxicity rate at the MTD. CRM with a fixed-sample performed
+better than a CRM with stopping rule that ensures a narrow confidence
+interval around the toxicity rate at the MTD. CRM-based methods were
+found to be better than SM in terms of accuracy and optimal dose
+allocation in almost all cases except when the true dose was among the
+lower levels. (Iasonos et al. 2008)
+
+Onar et al.~in their paper (Onar, Kocak, and Boyett 2009) provided
+modifications to CRM largely motivated by specific challenges
+encountered in the context of the Pediatric Brain Tumor Consortium
+trials and compared them to SM. While some versions of CRM assume
+availability of doses in a continuous way given a range, this paper used
+preset levels as it is more acceptable to clinicians and easier to
+manage operationally especially in multi-institutional settings.
+Patients in these pediatric trials were dosed by body surface area (BSA)
+instead of in terms of ``mg'' as done in adult trials. A frequentist
+likelihood-based approach with a 2-parameter logistic model (Piantadosi,
+Fisher, and Grossman 1998) was used as follows: Phu(x\_j, a) = exp(alpha
++ beta* x\_j) / (1 + exp(alpha + beta* x\_j\}). Also, ``prior
+information'' was used to fit the model which is needed especially
+during early trial stages. Compared to SM, simulations indicated that
+their modified CRM was more accurate, exposed fewer patients to
+potentially toxic doses and tended to require fewer patients. They also
+argued that as the CRM-based MTD has a consistent definition across
+trials, it is convenient especially in consortium settings where
+multiple agents are being tested in studies often running simultaneously
+and accruing from the same patient population. (Onar, Kocak, and Boyett
+2009)
+
+Onar-Thomas et al. (Onar-Thomas and Xiong 2010) compared the performance
+of CRM vs SM vs the Rolling-6 design via simulations. The Rolling-6
+design is a relative newcomer developed with the intention to shorten
+trial duration by minimizing the period of time during which the trial
+is closed to accrual for toxicity assessment. Results indicated that the
+toxicity rates were comparable across the 3 designs, but the SM and the
+Rolling 6 designs tended to treat a higher \% of patients at doses below
+the MTD. In cases where 5,6 or more dose levels were proposed to be
+studied and some toxicities were expected, model-based designs (CRM) had
+distinct advantages in being able to use the data from all dose levels
+in estimating the MTD, in accommodating patient-specific dosing and in
+providing an MTD estimate that is associated with a toxicity
+probability. Doses identified as MTD by the SM and the Rolling-6
+differed in a large \% of trials. Results also showed that body surface
+area (BSA)-based dosing used in pediatric trials can make a difference
+in dose escalation/de-escalation patterns in CRM relative to cases where
+such variations are not taken into account in the calculations (such as
+most adult trials) also leading to different MTDs in some cases.
+Rolling-6 was found to have shorter trials relative to SM. CRM lead to
+shorter trial duration for slow to medium accrual rates whereas
+Rolling-6 may have an advantage if the accrual rate is fast. Rolling-6
+may be preferable over the CRM if very few or no toxicity is expected
+with the agent under study and if the dose finding period is long.
+(Onar-Thomas and Xiong 2010)
+
+\hypertarget{references-16-20-by-william}{%
+\paragraph{2.2.4 References 16-20 (by
+William)}\label{references-16-20-by-william}}
+
+\hypertarget{reference-16}{%
+\paragraph{Reference 16:}\label{reference-16}}
+
+Le Tourneau et al. (2012)
+
+This paper provide evidence that more extensive implementation of
+innovative dose escalation designs such as mCRM and ATD in phase I
+cancer clinical trials of molecularly targeted agents. This paper did a
+literature review based on 84 trials that reached MTD. The goal was to
+get more insight on the efficiency of new dose escalation methods in
+phase I trials of molecularly targeted agents. The literature review
+indicated a standard 3+3 design was used in 41 trials (49\%) while newer
+algorithm based methods were also used, including ATD in 35 trials
+(42\%) and CRM (mCRM), which was employed in only 6 trials (7\%). The
+mean MTD to starting dose ratio appeared to be at least twice as high
+for trials using a mCRM or an ATD as for trials using a standard ``3+3''
+design. The mean number of patients exposed to a dose below the MTD for
+all three trial designs was similar, ranging from 19 to 23. the mean
+number of patients exposed to doses exceeding the MTD was at least twice
+as high in trials using a standard ``3+3'' design or an ATD when
+compared to trials using a mCRM
+
+\hypertarget{reference-17}{%
+\paragraph{Reference 17:}\label{reference-17}}
+
+Garrett-Mayer (2006)
+
+The paper `The continual reassessment method for dose-finding studies: a
+tutorial' provides detailed explanation how to implement a CRM. Does
+simulation with varying parameters to show how the CRM is better than
+the 3+3
+
+\hypertarget{reference-18-preview-version}{%
+\paragraph{Reference 18 (Preview
+version):}\label{reference-18-preview-version}}
+
+Cheung (2011)
+
+The book `Handbook of Methods for Designing, Monitoring, and Analyzing
+Dose-Finding Trials' discusses Phase I designs, methodology for Phase
+I/II. In addition various types of Phase II dose Finding trials are
+discussed. This book is trying to understand the high failure rate in
+Phase II clinical trials by improving the poor accuracy in early-phase
+trials. Book reviews the classical 3+3 design and model based designs.
+The book discusses barriers to adopting newer designs, available
+software and tools, current usage of different designs in clinical
+practice, modification of design rules related to start-up, stopping and
+choice of endpoints. Model based designed discussed include the CRM and
+escalation with overdose control
+
+\hypertarget{reference-19-preview-version}{%
+\paragraph{Reference 19 (Preview
+version):}\label{reference-19-preview-version}}
+
+O'Quigley, Iasonos, and Bornkamp (2017)
+
+The book `Dose Finding by the Continual Reassessment Method' focusses on
+CRM approach for studies designed with binary outcome and subjects come
+from a homogenous population. This book is a `how-to' book to implement
+CRM and includes what to do and what not to do. Book includes details on
+how to calibrate CRM parameters based on general patterns. The book also
+discusses the theoretical and methodological viewpoint including
+pathological behaviors of CRM modification in simpler settings. The goal
+of the book is finding dose criteria using a CRM design based on current
+literature and the CRM trials the author helped implement.
+
+\hypertarget{reference-20}{%
+\paragraph{Reference 20:}\label{reference-20}}
+
+Food, Administration, et al. (2013)
+
+FDA guidance indicates Bayesian methods can be used in clinical trial
+for Drugs and Biologics. This guidance indicates that Bayesian inference
+is characterized by drawing conclusions based directly on posterior
+probabilities that a drug is effective and has important differences
+from frequentist inference (Berger and Wolpert 1988). For trials that
+use Bayesian inference with informative prior distributions, such as
+trials that explicitly borrow external information, Bayesian statistical
+properties are more informative than Type I error probability.
+
+\newpage
+
+\hypertarget{methodology}{%
+\section{3. Methodology}\label{methodology}}
+
+\hypertarget{describe-the-use-of-the-logistic-regression-model-in-our-study-by-tongtong-jin}{%
+\subsection{3.1 Describe the use of the logistic regression model in our
+study (By Tongtong
+Jin)}\label{describe-the-use-of-the-logistic-regression-model-in-our-study-by-tongtong-jin}}
+
+The model we use here to predict the relation between dose level and the
+probability of DLT is the two-parameter logistic regression model which
+has the form as follows:
+\[p_j=p(d_j|\beta_1,\beta_2)=\frac{exp(\beta_1+exp(\beta_2)d_j)}{1+exp(\beta_1+exp(\beta_2)d_j)}.\]
+And in Bayesian setting, this is the likelihood function for dose level
+j given \(\beta_1\) and \(\beta_2\).
+
+\hypertarget{bayesian-crm}{%
+\subsubsection{3.1.1 Bayesian CRM}\label{bayesian-crm}}
+
+In the Bayesian setting of CRM, we first need to choose the prior
+distributions of parameters \(\beta_1\) and \(\beta_2\). Let's denote
+the prior by \(f(\beta_1,\beta_2)\). Then the posterior distribution
+given the data of k dose levels \(D_k\) is as follows:
+\[L(D_k|\beta_1,\beta_2)=\prod_{j=1}^{k}p_j^{y_j}(1-p_j)^{n_j-y_j} ,\]
+where \(n_j\) is the number of tested patients at the j-th dose level,
+and \(y_j\) is the number of patients showing DLT at the j-th dose
+level. Then we can get to the posterior distribution given \(D_k\) by
+applying above in the Bayes' rule. The posterior is
+\[p_k(\beta_1,\beta_2|D_k)=\frac{L(D_k|\beta_1,\beta_2)f(\beta_1,\beta_2)}{\iint L(D_k|\beta_1,\beta_2)f(\beta_1,\beta_2)d \beta_1 d \beta_2}.\]
+
+Then the posterior mean of DLT probability at each dose level is
+\[\mathbf{E}[p_j|D_k]=\iint p_j p_k(\beta_1,\beta_2|D_k)d \beta_1 d \beta_2\]
+
+To look for an appropriate dose level for the next trial, our principle
+is to find the dose level with the DLT probability closest to TTL. Hence
+the next dose level can be defined as
+\[d_{next}=\arg\min_{d_j\in S}(|TTL-\mathbf{E}[p_j|D_k]|).\] Here S is
+the set of all permissible choices of dose level.(Babb and Rogatko 2004)
+
+\hypertarget{two-stage-likelihood-based-crm}{%
+\subsubsection{3.1.2 Two-stage likelihood-based
+CRM}\label{two-stage-likelihood-based-crm}}
+
+Two-stage likelihood CRM divides the process into two stages. In the
+first stage, the patients are dosed in single-patient cohorts until the
+first DLT appears. After the first appearance of DLT, the CRM starts to
+work on the data based on all the previous trials (first-stage data
+included).
+
+The stage 2 procedure is similar to the above, but using a maximum
+likelihood estimation (MLE) to estimate the parameters \(\beta_1\) and
+\(\beta_2\) and calculate the corresponding probability of DLT at each
+dose level. The estimated parameters based on given data on k dose
+levels are
+\[(\hat{\beta_1},\hat{\beta_2})=\arg\max_{(\beta_1,\beta_2)} L(D_k|\beta_1,\beta_2).\]
+Here \(L(D_k|\beta_1,\beta_2)\) is the same as defined above in the
+Bayesian setting. Then we can compute the probability to DLT at each
+dose level under the current MLE of the parameters
+\(p(d_j|\hat{\beta_1},\hat{\beta_2})\). Now since we want the next dose
+level to have the closest probability of DLT to TTL, we're able to
+define the next dose level by
+\[d_{next}=\arg\min_{d_j\in S}(|TTL-p(d_j|\hat{\beta_1},\hat{\beta_2})|).\]
+Iterate above procedure until the dose level meets the stopping
+condition. Then the second stage terminates.(Wages, Conaway, and
+O'Quigley 2013)
+
+\hypertarget{by-ujjwal-sehrawat}{%
+\subsection{3.2 (By Ujjwal Sehrawat)}\label{by-ujjwal-sehrawat}}
+
+\begin{itemize}
+\tightlist
+\item
+  Note: content?
+\end{itemize}
+
+\hypertarget{implementation-plan-by-yiwei-ding}{%
+\subsection{3.3 Implementation plan (By Yiwei
+Ding)}\label{implementation-plan-by-yiwei-ding}}
+
+Here we reproduce results in specific figures by fitting a logistic
+regression model. We run simulations using the CRM with logistic
+regression, and we derive Figure 6\&7. Figure 6 used a one-stage
+Bayesian approach and Figure 7 used a two-stage likelihood-based
+approach.
+
+To reproduce Fig. 6, we should use a one-parameter logistic model and
+placed an exponential prior distribution with a mean of 1. Throughout
+the trial, calculations were made for the posterior estimates of the
+likelihood of dose-limiting toxicity (DLT) at each dosage. The upcoming
+group was then administered the dosage that had an estimated DLT
+probability most closely aligning with the target toxicity level (TTL).
+
+To reproduce Fig. 7, instead we implemente a two-stage likelihood-based
+CRM design. We combined a one-parameter power model for the
+dose-toxicity relationship. During the initial stage, virtual patients
+were given gradually increasing doses, starting with a dose of 10 ng/kg,
+which was 1\% of the Maximum Tolerable Dose (MTD) in dogs. If a grade 2+
+non-DLT adverse event occurred in a patient, two more virtual patients
+received the same dosage. If none of the trio exhibited a Dose-Limiting
+Toxicity (DLT), the study continued escalating the dosage in the first
+stage. Once the first DLT was observed, the second stage, based on the
+model, was initiated.
+
+A dose skeleton, which was determined after the first DLT (as it wasn't
+needed during the first phase), was used to establish dose labels for
+each dose. The likelihood of a DLT at each dose was determined using
+maximum likelihood methods, and the upcoming patient was assigned the
+dose that had an estimated DLT likelihood closest to the Target Toxicity
+Level (TTL). This was under the condition that no dose level that hadn't
+been tested could be bypassed. Single-patient cohorts were the norm
+because a low toxicity incidence was anticipated, and each virtual
+patient was thoroughly observed before the next patient was assigned a
+dose.
+
+\hypertarget{model-reproduction}{%
+\section{Model Reproduction}\label{model-reproduction}}
+
+\begin{itemize}
+\tightlist
+\item
+  Reproduce results in Figures 6 \& 7
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# R code for model reproduction goes here}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{simulation-studies}{%
+\section{Simulation Studies}\label{simulation-studies}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# R code for simulation studies goes here}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{results-and-discussion}{%
+\section{Results and Discussion}\label{results-and-discussion}}
+
+Answers to the questions
+
+\hypertarget{conclusion}{%
+\section{Conclusion}\label{conclusion}}
+
+Summary of the report
+
+\hypertarget{reference}{%
+\section*{Reference}\label{reference}}
+\addcontentsline{toc}{section}{Reference}
+
+\hypertarget{refs}{}
+\begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-AdaptiveDesignsWorkingGroup2017}{}}%
+Adaptive Designs Working Group of the MRC Network of Hubs for Trials
+Methodology Research. 2017. {``A Quick Guide Why Not to Use a+b
+Designs.''} 2017.
+\url{http://methodologyhubs.mrc.ac.uk/files/6814/6253/2385/A_quick_guide_why_not_to_use_AB_designs.pdf}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-babb2004bayesian}{}}%
+Babb, James S, and André Rogatko. 2004. \emph{Bayesian Methods for
+Cancer Phase i Clinical Trials}. New York: Marcel Dekker.
+
+\leavevmode\vadjust pre{\hypertarget{ref-brock2017implementing}{}}%
+Brock, Kristian, Lucinda Billingham, Mhairi Copland, Shamyla Siddique,
+Mirjana Sirovica, and Christina Yap. 2017. {``Implementing the EffTox
+Dose-Finding Design in the Matchpoint Trial.''} \emph{BMC Medical
+Research Methodology} 17 (1): 1--15.
+
+\leavevmode\vadjust pre{\hypertarget{ref-cater1972study}{}}%
+Cater, SK. 1972. {``Study Design Principles for Clinical Evaluation of
+New Drugs as Developed by the Chemotherapy Program of the National
+Cancer Institute.''} \emph{The Design of Clinical Trials in Cancer
+Therapy}, 242--89.
+
+\leavevmode\vadjust pre{\hypertarget{ref-cheung2011dose}{}}%
+Cheung, Ying Kuen. 2011. \emph{Dose Finding by the Continual
+Reassessment Method}. CRC Press.
+
+\leavevmode\vadjust pre{\hypertarget{ref-chevret1993continual}{}}%
+Chevret, Sylvie. 1993. {``The Continual Reassessment Method in Cancer
+Phase i Clinical Trials: A Simulation Study.''} \emph{Statistics in
+Medicine} 12 (12): 1093--1108.
+
+\leavevmode\vadjust pre{\hypertarget{ref-chiuzan2017dose}{}}%
+Chiuzan, Cody, Jonathan Shtaynberger, Gulam A Manji, Jimmy K Duong, Gary
+K Schwartz, Anastasia Ivanova, and Shing M Lee. 2017. {``Dose-Finding
+Designs for Trials of Molecularly Targeted Agents and
+Immunotherapies.''} \emph{Journal of Biopharmaceutical Statistics} 27
+(3): 477--94.
+
+\leavevmode\vadjust pre{\hypertarget{ref-food2013adaptive}{}}%
+Food, Drug Administration, et al. 2013. {``Adaptive Design Clinical
+Trials for Drugs and Biologics; 2018.''} \emph{Available at: Fda.
+Gov/Regulatory-Information/Search-Fda-Guidance-Documents/Adaptive-Design-Clinical-Trials-Drugs-and-Biologics.
+Accessed {[}September 12, 2019{]}}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-garrett2006continual}{}}%
+Garrett-Mayer, Elizabeth. 2006. {``The Continual Reassessment Method for
+Dose-Finding Studies: A Tutorial.''} \emph{Clinical Trials} 3 (1):
+57--71.
+
+\leavevmode\vadjust pre{\hypertarget{ref-harrington2013adaptive}{}}%
+Harrington, Jennifer A, Graham M Wheeler, Michael J Sweeting, Adrian P
+Mander, and Duncan I Jodrell. 2013. {``Adaptive Designs for Dual-Agent
+Phase i Dose-Escalation Studies.''} \emph{Nature Reviews Clinical
+Oncology} 10 (5): 277--88.
+
+\leavevmode\vadjust pre{\hypertarget{ref-iasonos2016dimension}{}}%
+Iasonos, Alexia, Nolan A Wages, Mark R Conaway, Ken Cheung, Ying Yuan,
+and John O'Quigley. 2016. {``Dimension of Model Parameter Space and
+Operating Characteristics in Adaptive Dose-Finding Studies.''}
+\emph{Statistics in Medicine} 35 (21): 3760--75.
+
+\leavevmode\vadjust pre{\hypertarget{ref-iasonos2008comprehensive}{}}%
+Iasonos, Alexia, Andrew S Wilton, Elyn R Riedel, Venkatraman E Seshan,
+and David R Spriggs. 2008. {``A Comprehensive Comparison of the
+Continual Reassessment Method to the Standard 3+ 3 Dose Escalation
+Scheme in Phase i Dose-Finding Studies.''} \emph{Clinical Trials} 5 (5):
+465--77.
+
+\leavevmode\vadjust pre{\hypertarget{ref-jaki2013principles}{}}%
+Jaki, Thomas, Sally Clive, and Christopher J Weir. 2013. {``Principles
+of Dose Finding Studies in Cancer: A Comparison of Trial Designs.''}
+\emph{Cancer Chemotherapy and Pharmacology} 71: 1107--14.
+
+\leavevmode\vadjust pre{\hypertarget{ref-korn1994comparison}{}}%
+Korn, Edward L, Douglas Midthune, T Timothy Chen, Lawrence V Rubinstein,
+Michaele C Christian, and Richard M Simon. 1994. {``A Comparison of Two
+Phase i Trial Designs.''} \emph{Statistics in Medicine} 13 (18):
+1799--1806.
+
+\leavevmode\vadjust pre{\hypertarget{ref-kuen2013sample}{}}%
+Kuen Cheung, Ying. 2013. {``Sample Size Formulae for the Bayesian
+Continual Reassessment Method.''} \emph{Clinical Trials} 10 (6):
+852--61.
+
+\leavevmode\vadjust pre{\hypertarget{ref-le2012efficiency}{}}%
+Le Tourneau, Christophe, Hui K Gan, Albiruni RA Razak, and Xavier
+Paoletti. 2012. {``Efficiency of New Dose Escalation Designs in
+Dose-Finding Phase i Trials of Molecularly Targeted Agents.''}
+\emph{PloS One} 7 (12): e51039.
+
+\leavevmode\vadjust pre{\hypertarget{ref-le2009dose}{}}%
+Le Tourneau, Christophe, J Jack Lee, and Lillian L Siu. 2009. {``Dose
+Escalation Methods in Phase i Cancer Clinical Trials.''} \emph{JNCI:
+Journal of the National Cancer Institute} 101 (10): 708--20.
+
+\leavevmode\vadjust pre{\hypertarget{ref-moller1995extension}{}}%
+Møller, Susanne. 1995. {``An Extension of the Continual Reassessment
+Methods Using a Preliminary up-and-down Design in a Dose Finding Study
+in Cancer Patients, in Order to Investigate a Greater Range of Doses.''}
+\emph{Statistics in Medicine} 14 (9): 911--22.
+
+\leavevmode\vadjust pre{\hypertarget{ref-o1999another}{}}%
+O'Quigley, John. 1999. {``Another Look at Two Phase i Clinical Trial
+Designs.''} \emph{Statistics in Medicine} 18 (20): 2683--90.
+
+\leavevmode\vadjust pre{\hypertarget{ref-o2017handbook}{}}%
+O'Quigley, John, Alexia Iasonos, and Björn Bornkamp. 2017.
+\emph{Handbook of Methods for Designing, Monitoring, and Analyzing
+Dose-Finding Trials}. CRC press.
+
+\leavevmode\vadjust pre{\hypertarget{ref-o1990continual}{}}%
+O'Quigley, John, Margaret Pepe, and Lloyd Fisher. 1990. {``Continual
+Reassessment Method: A Practical Design for Phase 1 Clinical Trials in
+Cancer.''} \emph{Biometrics}, 33--48.
+
+\leavevmode\vadjust pre{\hypertarget{ref-o2006experimental}{}}%
+O'Quigley, John, and S Zohar. 2006. {``Experimental Designs for Phase i
+and Phase i/II Dose-Finding Studies.''} \emph{British Journal of Cancer}
+94 (5): 609--13.
+
+\leavevmode\vadjust pre{\hypertarget{ref-onar2009continual}{}}%
+Onar, Arzu, Mehmet Kocak, and James M Boyett. 2009. {``Continual
+Reassessment Method Vs. Traditional Empirically Based Design:
+Modifications Motivated by Phase i Trials in Pediatric Oncology by the
+Pediatric Brain Tumor Consortium.''} \emph{Journal of Biopharmaceutical
+Statistics} 19 (3): 437--55.
+
+\leavevmode\vadjust pre{\hypertarget{ref-onar2010simulation}{}}%
+Onar-Thomas, Arzu, and Zang Xiong. 2010. {``A Simulation-Based
+Comparison of the Traditional Method, Rolling-6 Design and a Frequentist
+Version of the Continual Reassessment Method with Special Attention to
+Trial Duration in Pediatric Phase i Oncology Trials.''}
+\emph{Contemporary Clinical Trials} 31 (3): 259--70.
+
+\leavevmode\vadjust pre{\hypertarget{ref-penel2012does}{}}%
+Penel, Nicolas, and Andrew Kramar. 2012. {``What Does a
+Modified-Fibonacci Dose-Escalation Actually Correspond To?''} \emph{BMC
+Medical Research Methodology} 12 (1): 1--5.
+
+\leavevmode\vadjust pre{\hypertarget{ref-piantadosi1998practical}{}}%
+Piantadosi, S, JD Fisher, and S Grossman. 1998. {``Practical
+Implementation of a Modified Continual Reassessment Method for
+Dose-Finding Trials.''} \emph{Cancer Chemotherapy and Pharmacology} 41:
+429--36.
+
+\leavevmode\vadjust pre{\hypertarget{ref-rogatko2007translation}{}}%
+Rogatko, André, David Schoeneck, William Jonas, Mourad Tighiouart, Fadlo
+R Khuri, and Alan Porter. 2007. {``Translation of Innovative Designs
+into Phase i Trials.''} \emph{Journal of Clinical Oncology} 25 (31):
+4982--86.
+
+\leavevmode\vadjust pre{\hypertarget{ref-thall2003practical}{}}%
+Thall, PF, and S-J Lee. 2003. {``Practical Model-Based Dose-Finding in
+Phase i Clinical Trials: Methods Based on Toxicity.''}
+\emph{International Journal of Gynecologic Cancer} 13 (3).
+
+\leavevmode\vadjust pre{\hypertarget{ref-wages2013performance}{}}%
+Wages, Nolan A, Mark R Conaway, and John O'Quigley. 2013. {``Performance
+of Two-Stage Continual Reassessment Method Relative to an Optimal
+Benchmark.''} \emph{Clinical Trials} 10 (6): 862--75.
+
+\leavevmode\vadjust pre{\hypertarget{ref-wheeler2019design}{}}%
+Wheeler, Graham M, Adrian P Mander, Alun Bedding, Kristian Brock,
+Victoria Cornelius, Andrew P Grieve, Thomas Jaki, et al. 2019. {``How to
+Design a Dose-Finding Study Using the Continual Reassessment Method.''}
+\emph{BMC Medical Research Methodology} 19 (1): 1--15.
+
+\end{CSLReferences}
+
+\end{document}
