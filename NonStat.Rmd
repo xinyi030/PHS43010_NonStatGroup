@@ -366,6 +366,16 @@ The results of this simulation, however, did not improve the accuracy of the fir
 ![](zikai_sim_results/Case2_Proportion of trials recommending each dose level.png)
 
 
+## Toss-out samples plus early alterations (by Gabriel Nicholson) 
+
+In the original paper the authors mentioned that their own model suggested they turn up the heat and go for the highest dose after the first three patients did not get sick. However, they intervened since this did not seem wise nor did it make sense given their dosage selections. It turns out that this strategy is an excellent way to hedge your bet if you have no idea where the true dose lies. By adding this rule into the simulation manually, the model is forced to go to dose 3 instead of dose 6 if the first three patients do not get sick. With this one move the discrepancy reduces from 17% to around 9%.
+
+One may argue that this is an obvious approach or it is a cheap way of answering the question since it has no practical value if doctors are already following this strategy. Another method is to isolate the simulations to cases where the model did not get completely stuck. Out of 5000 simulations, 6% of these simulations scenario 1 and 3% in scenario 2 got stuck sampling the final dose it chose for more than 90% of the trial samples. For this to occur, only one other dose was tested and the remainder were from the dose that was chosen. From the figure below we can clearly see that this is directly causing a decrease in accuracy. Once removing these simulations, the accuracy of scenario 1 jumps up to around 60% and the accuracy of scenario 2 decreases slightly to around 62% (down from 64%). Now the difference has shrunk to 2% without much loss of accuracy from scenario 2! This strategy works well regardless of what the true dose is and this can be shown through simulations by randomly creating true dose toxicities other than the two given in the assignment.
+
+![](gabe_sim_files/gabe_sim_fig.png)
+
+This is an aggressive solution for helping the model become "unstuck" from oversampling one dose. From the outside we know that the model is not sampling enough variation and it is likely overconfident in its predictions. So I am sure there is a more objective way to quantify this uncertainty—whether it be through cross-validation or some other approach—but for now I propose just ignoring these trials in lieu of a better method to show what is possible for reducing the discrepancy. 
+
 ## Conditionally adding extra lower dose level (by Bowei Kang)
 
 The idea is increasing estimate accuracy by expanding the dose range. In a simple linear regression, $Y = \alpha + \beta X + \epsilon$, $Var(\hat{\beta} = \sigma^2 (X′X)^{-1}$. Small sample variation in $X$ leads to the inflation in standard error of the estimate. 
