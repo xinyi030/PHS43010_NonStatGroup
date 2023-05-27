@@ -328,7 +328,14 @@ In contrast, under the parameters of the second scenario, a significantly higher
 | Dose level (mg/m^2/day) | 0.5 | 1 | 3 | 5 | 6 |
 |----------|----------|----------|----------|----------|----------|
 | Scenario 1    | 0.301 | 0.378 | 0.276 | 0.0427 | 0.00183 |
-| Scenario 2    | 0.0834 | 0.0863 | 0.152 | 0.481 | 0.197 |
+| Scenario 2    | 0.0834 | 0.0863 | 0.152 | 0.481 | 0.197|
+
+
+The performance difference of the CRM model under the two scenarios is because firstly, the true toxicity probabilities under the first scenario have a smaller discrepancy 
+between 0.5 mg (true toxicity of 0.25) and 1 mg (true toxicity of 0.3). Hence, a fair amount of trials under scenario 1 choose 0.5 mg as the MTD. 
+second, the true toxicity probabilities under scenario 2 is much closer to the prior assumed toxicity probabilities, i.e. the skeletons. Therefore, it's easier 
+for the CRM model to estimate the posterior probabilities under scenario 2.
+
 
 
 From these results we can say that there is a difference in favor of scenario 2 by around 21%.
