@@ -257,6 +257,35 @@ $$
 
 The prior on $\beta_1$ is an exponential distribution with mean 1. They chose (0.05, 0.10, 0.15, 0.33, 0.50) as their skeleton. In the trial, the dose escalation is based on point estimates of the posterior probability of a dose-limiting toxicity (DLT) at each dose level. According to this rule, the next cohort is treated at the dose with the closest mean or median posterior probability of DLT to the specified target probability, 33% in our case. We reproduce figures 6 below. 
 
+## Figure 7 (By Bowei Kang)
+
+```{r}
+library(dfcrm)
+dose = c(10, 20, 40, 100, 200, 400, seq(800, 6400, by = 800))
+y = rep(0, 37); y[c(26, 35, 37)] = 1
+level = c(1:11, rep(10,3), rep(11,4), rep(12,8), rep(13,6), rep(14,5))
+# use standard logistic regression prediction as prior p(DTL)
+data = data.frame(x=dose[level], y)
+logit = glm(y ~ x, family = "binomial")
+x_pred = with(data, data.frame(x = dose))
+tbl = cbind(x_pred, predict(logit, newdata = x_pred, type = "response", se = F))
+p.tox0 = tbl[,2]
+target = 0.2
+foo <- crm(p.tox0, target, y, level, model = 'logistic')
+ptox <- foo$ptox  # updated estimates of toxicity rates
+```
+
+```{r}
+library(ggplot2)
+tbl = data.frame(x=dose, p=foo$ptox, lb=foo$ptoxL, ub=foo$ptoxU)
+ggplot(tbl) + 
+geom_line(aes(x, p)) + geom_point(aes(x, p), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) + 
+geom_line(aes(x, ub), linetype = 2) + geom_point(aes(x, ub), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) +
+geom_line(aes(x, lb), linetype = 2) + geom_point(aes(x, lb), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) +
+geom_hline(yintercept = 0.2, col = 'red', linetype = 2, linewidth = 0.8) + 
+theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+scale_x_continuous(breaks = dose[-(2:6)]) + labs(title = 'Repeat Figure 7(b)', x = 'Dose', y = 'Probability of DLT')
+```
 
 ![](fig6b_zkl.png)
 
@@ -329,7 +358,6 @@ The results of this simulation, however, did not improve the accuracy of the fir
 
 # Results and Discussion
 
-Answers to the questions
 
 # Conclusion
 
