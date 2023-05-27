@@ -294,7 +294,7 @@ scale_x_continuous(breaks = dose[-(2:6)]) + labs(title = 'Repeat Figure 7(b)', x
 # Simulation Studies (By Wenqian & Gabe)
 
 To rigorously assess the effect of varying true toxicity probabilities on the estimated MTD within the CRM model, we conducted simulation studies under two distinct scenarios, each comprising 1000 trials.
-In the first scenario, the true toxicity probabilities were set at 0.25, 0.3, 0.5, 0.6, and 0.7, while in the second, they were defined as 0.01, 0.05, 0.2, 0.3, and 0.5. This design facilitated a comprehensive comparative analysis of the impact of different toxicity probabilities on the estimated MTD.
+In the first scenario, the true toxicity probabilities were set at (0.25, 0.3, 0.5, 0.6, 0.7), while in the second, they were defined as (0.01, 0.05, 0.2, 0.3, 0.5). This design facilitated a comprehensive comparative analysis of the impact of different toxicity probabilities on the estimated MTD.
 Each trial was conducted with a sample size of 36, a cohort size of 3, and an initial dose level of 0.5 mg. The target toxicity rate was set at 0.33. The MTD was identified as the dose level where the estimated toxicity probability was closest to the target toxicity rate, ensuring a statistically robust and clinically relevant selection.
 
 
@@ -313,6 +313,7 @@ The prior standard deviation of $\beta_1$ and $\beta_2$ are both assumed to be 1
 
 ![](wenqian_sim_results/prior.png)
 
+### Question 1. Is there a difference in performance between the two scenarios?
 In the context of the first scenario, a comprehensive analysis of the 1000 trials revealed that 47.3% accurately identified 1 mg as the Maximum Tolerated Dose (MTD), which aligns with the true MTD as determined by the pre-set toxicity probabilities. Furthermore, it was observed that 37.8% of the simulated "patients" received treatment at this dose level.
 
 In contrast, under the parameters of the second scenario, a significantly higher proportion of trials, 69.2% to be precise, correctly selected 5 mg as the MTD. Additionally, 48.1% of the "patients" within these simulations were treated at this dose level.
@@ -336,7 +337,17 @@ second, the true toxicity probabilities under scenario 2 is much closer to the p
 for the CRM model to estimate the posterior probabilities under scenario 2.
 
 
-# Some explorations
+
+From these results we can say that there is a difference in favor of scenario 2 by around 21%.
+
+# Question 2. What is the reason for the difference?
+
+By carefully analyzing the simulations, there are two main reasons that are causing the difference. The first reason is that in both scenarios there is a reasonable chance that all three patients will not get sick. When this occurs, the next highest dose selected is dose six. For scenario 2, this jumpy is actually beneficial since dose 6 is 17% higher than the dose we want, so it quickly goes down and begins sampling at the correct dose. In contrast, for scenario 1, being at dose 6 is much further from the true dose, so it has to slowly climb down and the simulation risks getting stuck sampling the wrong dose for too many trials if by chance 1/3 patients get sick. The final result of this process is that the wrong doses are oversampled more often in scenario 1 compared to scenario 2.
+
+The second reason is that the true dose for scenario 1 is only 5% different from the next closest dose while for scenario 2 the difference is twice as large as 10%. This makes it more likely to select the wrong dose for scenario 1 compared to scenario 2 for obvious reasons. With these causes in mind, we propose three strategies to mitigate the difference.
+
+# Question 3. Can the difference be mitigated?
+
 ## The use of Bayes risk and Bayesian decision theory (Zikai)
 
 The standard dose recommendation rule in the use of the CRM relies on point estimates of the posterior probability of a dose-limiting toxicity (DLT) at each dose level. According to this rule, the next cohort is treated at the dose with the closest mean or median posterior probability of DLT to the specified target probability, 33% in our case. This rule is simple and easy to implement. However, it disregards the uncertainty associated with the point estimates of the posterior probabilities, which can usually be substantial given the small sample sizes. 
