@@ -1,14 +1,16 @@
 ---
-title: "Final Project: Bayesian Inference Clinical Trials and Nonparametric Models"
+title: 'Final Project: Bayesian Inference Clinical Trials and Nonparametric Models'
 author: "Non-stat Team: Captain: Xinyi Zhang, Members: ..."
 date: "`r Sys.Date()`"
-output: 
+output:
+  html_document:
+    df_print: paged
   pdf_document:
-    extra_dependencies: ["hyperref"]
-    keep_tex: true
+    extra_dependencies: hyperref
+    keep_tex: yes
 header-includes:
-  - \usepackage{hyperref}
-  - \hypersetup{colorlinks=true, citecolor=blue, linkcolor=blue, urlcolor=blue}
+- \usepackage{hyperref}
+- \hypersetup{colorlinks=true, citecolor=blue, linkcolor=blue, urlcolor=blue}
 bibliography: BibFile.bib
 ---
 
@@ -241,9 +243,9 @@ A dose skeleton, which was determined after the first DLT (as it wasn't needed d
 
 
 
-# Model Reproduction (By Zikai & Bowei)
+# Model Reproduction
 
--   Reproduce results in Figures 6 & 7
+## Reproduction of results in Figure 6 (By Zikai)
 
 ```{r echo=TRUE}
 # R code for model reproduction goes here
@@ -261,7 +263,7 @@ The prior on $\beta_1$ is an exponential distribution with mean 1. They chose (0
 
 ## Figure 7 (By Bowei Kang)
 
-```{r}
+```{r eval=F}
 library(dfcrm)
 dose = c(10, 20, 40, 100, 200, 400, seq(800, 6400, by = 800))
 y = rep(0, 37); y[c(26, 35, 37)] = 1
@@ -277,7 +279,7 @@ foo <- crm(p.tox0, target, y, level, model = 'logistic')
 ptox <- foo$ptox  # updated estimates of toxicity rates
 ```
 
-```{r}
+```{r eval=F}
 library(ggplot2)
 tbl = data.frame(x=dose, p=foo$ptox, lb=foo$ptoxL, ub=foo$ptoxU)
 ggplot(tbl) + 
@@ -348,18 +350,18 @@ The second reason is that the true dose for scenario 1 is only 5% different from
 
 # Question 3. Can the difference be mitigated?
 
-## The use of Bayes risk and Bayesian decision theory (Zikai)
+## The use of Bayes risk and Bayesian decision theory (By Zikai)
 
 The standard dose recommendation rule in the use of the CRM relies on point estimates of the posterior probability of a dose-limiting toxicity (DLT) at each dose level. According to this rule, the next cohort is treated at the dose with the closest mean or median posterior probability of DLT to the specified target probability, 33% in our case. This rule is simple and easy to implement. However, it disregards the uncertainty associated with the point estimates of the posterior probabilities, which can usually be substantial given the small sample sizes. 
 
 An alternative is to use Bayes risk for posterior probability intervals associated with each dose as the inferential summary (Neuenschwander, Branson and Gsponer, 2008). We first define Bayes risk values for each of the following intervals:
 
-\begin{aligned*}
+$$
 L(\theta, d)= \begin{cases}\ell_1=1 & \text { if } \pi_\theta(d) \in(0,0.31] \\
 \ell_2=0 & \text { if } \pi_\theta(d) \in(0.31,0.35] \\
 \ell_3=1 & \text { if } \pi_\theta(d) \in(0.35,0.6] \\
 \ell_4=2 & \text { if } \pi_\theta(d) \in(0.6,1]\end{cases}
-\end{aligned*}
+$$
 
 After each cohort of patients has gone through the trial, we estimate the posterior distributions of toxicity for each dose level, $\pi_\theta(d)$. The Bayes risk of each dose level is calculated as follows:
 $\ell_1 P\left\{\pi_\theta(d) \in\right.\right. \left.(0,0.31]\}+\ell_2 P\left\{\pi_\theta(d) \in(0.31,0.35]\right\}+\ell_3 P\left\{\pi_\theta(d) \in(0.35,0.6]\right\}+\ell_4 P\left\{\pi_\theta(d) \in(0.6,1]\right\}$
