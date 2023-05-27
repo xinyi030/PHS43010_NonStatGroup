@@ -257,6 +257,8 @@ $$
 
 The prior on $\beta_1$ is an exponential distribution with mean 1. They chose (0.05, 0.10, 0.15, 0.33, 0.50) as their skeleton. In the trial, the dose escalation is based on point estimates of the posterior probability of a dose-limiting toxicity (DLT) at each dose level. According to this rule, the next cohort is treated at the dose with the closest mean or median posterior probability of DLT to the specified target probability, 33% in our case. We reproduce figures 6 below. 
 
+![](fig6b_zkl.png)
+
 ## Figure 7 (By Bowei Kang)
 
 ```{r}
@@ -286,8 +288,6 @@ geom_hline(yintercept = 0.2, col = 'red', linetype = 2, linewidth = 0.8) +
 theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
 scale_x_continuous(breaks = dose[-(2:6)]) + labs(title = 'Repeat Figure 7(b)', x = 'Dose', y = 'Probability of DLT')
 ```
-
-![](fig6b_zkl.png)
 
 ![](fig.7.rep.dfcrm.png)
 
@@ -354,6 +354,340 @@ The results of this simulation, however, did not improve the accuracy of the fir
 
 ![](zikai_sim_results/Case2_Proportion of trials recommending each dose level.png)
 
+
+## Conditionally adding extra lower dose level (by Bowei Kang)
+
+The idea is increasing estimate accuracy by expanding the dose range. In a simple linear regression, $Y = \alpha + \beta X + \epsilon$, $Var(\hat{\beta} = \sigma^2 (X′X)^{-1}$. Small sample variation in $X$ leads to the inflation in standard error of the estimate. 
+
+We propose the following design: at the 1/3 cut point of the trail, we evaluate the dose visit frequency. If the distribution is too skewed to the right, that is, most patients are assigned to dose level 1, an extra lower level 0 will be added for the remaining 2/3 patients. Otherwise, we continue the previous standard CRM design.
+
+The proposed design can improve accuracy for scenario 1 and mitigate the discrepancy between the two scenarios. This is demonstrated by the following simulation results.
+
+```{r message=F}
+library(bcrm)
+library(ggplot2)
+library(tidyverse)
+```
+
+```{r}
+dose = c(0.5, 1, 3, 5, 6)
+p.tox0 = c(0.05, 0.10, 0.15, 0.33,0.50) 
+p_true_1 = c(0.25, 0.30, 0.50, 0.60, 0.70)
+p_true_2 = c(0.01, 0.05, 0.20, 0.30, 0.50)
+N = 36
+n_per_cohort = 3
+ncohort = N/n_per_cohort
+target = 0.33
+```
+
+### Classical CRM (as comparison)
+
+Functions
+
+```{r}
+single_run = function(N, n_per_cohort, target, p_true, p.tox0, dose, plt = F) {
+ncohort = N/n_per_cohort
+path = data.frame(patient = 1:N, dose = NA, tox = NA, batches = NA)
+# Here dose represent dose levels of recruited patients, ranging from 1, ..., k
+# generate a path
+for (i in 1:ncohort) {
+if (i == 1) {
+level_current = 1
+batch_current = 1
+}
+path[((i-1)*3+1):(i*3), 'dose']  = level_current
+path[((i-1)*3+1):(i*3), 'batches'] = batch_current
+path[((i-1)*3+1):(i*3), 'tox'] = rbinom(n_per_cohort, 1, p_true[level_current])
+# estimate p.tox profile based on current path
+ids_batch_sofar = which(path[, 'batches'] %in% 1:batch_current)
+level_update_bcrm = bcrm(stop = list(nmax = length(ids_batch_sofar)), data = path[ids_batch_sofar, ], dose = dose, p.tox0 = p.tox0, ff="logit2", prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))), target.tox = target, constrain = F, pointest = "mean", method = 'rjags')
+# pointest: Which summary estimate of the posterior distribution should be used to choose the next dose.
+level_update = as.numeric(level_update_bcrm$ndose[[1]]$ndose)
+# update current level and batch 
+if (level_update != level_current) {
+batch_current = batch_current + 1
+level_current = level_update
+} 
+} # end for
+# assume normal priors for params. mu = 0, sd = 1 for both. independent
+final_est = bcrm(stop = list(nmax = N), data = path, dose = dose, p.tox0 = p.tox0, ff="logit2", prior.alpha = list(4, c(1, 1), rbind(c(1, 0), c(0, 1))), target.tox = target, constrain = F, pointest="mean", method = 'rjags')
+ptox = final_est$ndose[[1]]$est
+ptoxL = final_est$ndose[[1]]$quantiles[1,]
+ptoxU = final_est$ndose[[1]]$quantiles[5,]
+mtd = which.min(abs(ptox - target))
+if (plt) pp = plt_func(path, ptox, ptoxL, ptoxU, target, mtd, p_true, dose) else pp = NULL
+return(list(path = path, ptox = ptox, ptoxL = ptoxL, ptoxU = ptoxU, mtd = mtd, plt = pp))
+}
+``` 
+
+```{r}
+plt_func = function(path, ptox, ptoxL, ptoxU, target, mtd, p_true, dose) {
+p1 = ggplot(data.frame(path), aes(patient, dose, col = as.factor(tox))) + geom_point() + theme_bw() + ylim(0, length(dose) + 1) 
+tbl = data.frame(x = dose, p = ptox, lb = ptoxL, ub = ptoxU, ptrue = p_true)
+p2 = ggplot(tbl) + geom_line(aes(x, p)) + geom_point(aes(x, p), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) 
+p2 = p2 + geom_line(aes(x, ub), linetype = 2) + geom_point(aes(x, ub), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) + geom_line(aes(x, lb), linetype = 2) + geom_point(aes(x, lb), shape = 21, colour = "black", fill = "white", size = 2, stroke = 1) 
+p2 = p2 + geom_line(aes(x, ptrue), col = 'blue') + geom_point(aes(x, ptrue), shape = 22, colour = "blue", fill = "white", size = 2, stroke = 1) 
+p2 = p2 + geom_hline(yintercept = target, col = 'red', linetype = 2, linewidth = 0.8) 
+p2 = p2 + geom_vline(xintercept = dose[mtd], col = 'green4', linetype = 3, linewidth = 1)
+p2 = p2 + scale_x_continuous(breaks = dose) + labs(title = '', x = 'Dose', y = 'Probability of DLT')
+p2 = p2 + theme_bw() 
+return(ggarrange(p1, p2))
+}
+```
+
+Multiple runs - scenario 1
+
+```{r}
+set.seed(1)
+niter = 500
+res1 = replicate(niter, single_run(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_1, p.tox0 = p.tox0, dose = dose, plt = FALSE))
+# visit frequency
+print("Percent of patients assigned to each dose over all trials")
+vf1 = sapply(res1[1,], function(t) {
+summary = NULL
+for (i in 1:length(dose)) summary = c(summary, sum(t[, 'dose'] == i))
+return(summary)
+})
+rowSums(vf1) / (niter * N)
+# mtd
+print("Proportion of simulated trials recommending dose as MTD")
+# table(unlist(res1[5,])) / niter
+sapply(1:length(dose), function(t) mean(unlist(res1[5,]) == t))
+# True ptox
+print("True p's")
+p_true_1
+```
+
+Multiple runs - scenario 2
+
+```{r}
+set.seed(1)
+niter = 500
+res2 = replicate(niter, single_run(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_2, p.tox0 = p.tox0, dose = dose, plt = FALSE))
+# visit frequency
+print("Percent of patients assigned to each dose over all trials")
+vf2 = sapply(res2[1,], function(t) {
+summary = NULL
+for (i in 1:length(dose)) summary = c(summary, sum(t[, 'dose'] == i))
+return(summary)
+})
+rowSums(vf2) / (niter * N)
+# mtd
+print("Proportion of simulated trials recommending dose as MTD")
+# table(unlist(res2[5,])) / niter
+sapply(1:length(dose), function(t) mean(unlist(res2[5,]) == t))
+# True ptox
+print("True p's")
+p_true_2
+```
+
+### Modified CRM (conditionally adding extra lower dose)
+
+```{r}
+dose = c(0.5, 1, 3, 5, 6)
+p.tox0 = c(0.05, 0.10, 0.15, 0.33,0.50) 
+p_true_1 = c(0.25, 0.30, 0.50, 0.60, 0.70)
+p_true_2 = c(0.01, 0.05, 0.20, 0.30, 0.50)
+dose_add = c(0.25, dose)
+p.tox0_add = c(0.025, p.tox0)
+p_true_1_add = c(0.125, p_true_1)
+p_true_2_add = c(0.005, p_true_2)
+N = 36
+n_per_cohort = 3
+ncohort = N/n_per_cohort
+target = 0.33
+train_frac = 1/3
+```
+
+Functions
+
+```{r}
+single_run_add_dose = function(N, n_per_cohort, target, p_true_add, p.tox0_add, dose_add, train_frac = 2/3, plt = F) {
+p_true = p_true_add[-1]
+p.tox0 = p.tox0_add[-1]
+dose = dose_add[-1]
+ncohort = N/n_per_cohort
+path = data.frame(patient = 1:N, dose = NA, tox = NA, batches = NA)
+# Here dose represent dose levels of recruited patients, ranging from 1, ..., k
+# generate the path for the first half
+for (i in 1:(ncohort * train_frac)) {
+if (i == 1) {
+level_current = 1
+batch_current = 1
+}
+path[((i-1)*3+1):(i*3), 'dose']  = level_current
+path[((i-1)*3+1):(i*3), 'batches'] = batch_current
+path[((i-1)*3+1):(i*3), 'tox'] = rbinom(n_per_cohort, 1, p_true[level_current])
+# estimate p.tox profile based on current path
+ids_batch_sofar = which(path[, 'batches'] %in% 1:batch_current)
+level_update_bcrm = bcrm(stop = list(nmax = length(ids_batch_sofar)), data = path[ids_batch_sofar, ], dose = dose, p.tox0 = p.tox0, ff="logit2", prior.alpha=list(4, c(1, 1), rbind(c(1, 0), c(0, 1))), target.tox = target, constrain = F, pointest = "mean", method = 'rjags')
+# pointest: Which summary estimate of the posterior distribution should be used to choose the next dose.
+level_update = as.numeric(level_update_bcrm$ndose[[1]]$ndose)
+# update current level and batch 
+if (level_update != level_current) {
+batch_current = batch_current + 1
+level_current = level_update
+} 
+} # end for
+
+# 1/3 way evaluation
+# shift one level
+path[1:(N*train_frac), 'dose'] = path[1:(N*train_frac), 'dose'] + 1
+tt = table(path[1:(N*train_frac), 'dose'])
+add_flag = F
+# if the largest freq is attained at dose level 1
+if (sum(path[1:(N*train_frac), 'dose'] == 2) == max(tt)) {
+add_flag = T
+level_current = 1
+batch_current = batch_current + 1
+} 
+
+# second half
+for (i in (ncohort*train_frac+1):ncohort) {
+path[((i-1)*3+1):(i*3), 'dose']  = level_current
+path[((i-1)*3+1):(i*3), 'batches'] = batch_current
+path[((i-1)*3+1):(i*3), 'tox'] = rbinom(n_per_cohort, 1, p_true_add[level_current])
+# estimate p.tox profile based on current path
+ids_batch_sofar = which(path[, 'batches'] %in% 1:batch_current)
+level_update_bcrm = bcrm(stop = list(nmax = length(ids_batch_sofar)), data = path[ids_batch_sofar, ], dose = dose_add, p.tox0 = p.tox0_add, ff="logit2", prior.alpha=list(4, c(0, 0), rbind(c(1, 0), c(0, 1))), target.tox = target, constrain = F, pointest = "mean", method = 'rjags')
+# pointest: Which summary estimate of the posterior distribution should be used to choose the next dose.
+level_update = as.numeric(level_update_bcrm$ndose[[1]]$ndose)
+# update current level and batch 
+if (level_update != level_current) {
+batch_current = batch_current + 1
+level_current = level_update
+} 
+} # end for
+
+# assume normal priors for params. mu = 0, sd = 1 for both. independent
+final_est = bcrm(stop = list(nmax = N), data = path, dose = dose_add, p.tox0 = p.tox0_add, ff="logit2", prior.alpha = list(4, c(1, 1), rbind(c(1, 0), c(0, 1))), target.tox = target, constrain = F, pointest="mean", method = 'rjags')
+
+ptox = final_est$ndose[[1]]$est
+ptoxL = final_est$ndose[[1]]$quantiles[1,]
+ptoxU = final_est$ndose[[1]]$quantiles[5,]
+mtd = which.min(abs(ptox - target))
+if (plt) pp = plt_func(path, ptox, ptoxL, ptoxU, target, mtd, p_true_add, dose_add) else pp = NULL
+return(list(path = path, ptox = ptox, ptoxL = ptoxL, ptoxU = ptoxU, mtd = mtd, flag = add_flag, plt = pp))
+}
+```
+
+Multiple runs - scenario 1
+
+```{r}
+set.seed(1)
+niter = 500
+res1_add = replicate(niter, single_run_add_dose(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_1_add, p.tox0 = p.tox0_add, dose = dose_add, train_frac = 1/3, plt = FALSE))
+# visit frequency
+print("Percent of patients assigned to each dose over all trials")
+vf1_add_half1 = sapply(res1_add[1,], function(t) {
+summary = NULL
+for (i in 1:length(dose_add)) summary = c(summary, sum(t[1:(N*train_frac), 'dose'] == i))
+return(summary)
+})
+vf1_add_half2 = sapply(res1_add[1,], function(t) {
+summary = NULL
+for (i in 1:length(dose_add)) summary = c(summary, sum(t[(N*train_frac+1):N, 'dose'] == i))
+return(summary)
+})
+rowSums(vf1_add_half1) / (niter * N * train_frac)
+rowSums(vf1_add_half2) / (niter * N * (1-train_frac))
+# mtd
+print("Proportion of simulated trials recommending dose as MTD")
+# table(unlist(res1_add[5,])) / niter
+sapply(1:length(dose_add), function(t) mean(unlist(res1_add[5,]) == t))
+table(unlist(res1_add[6,])) / niter
+# True ptox
+print("True p's")
+p_true_1_add
+```
+
+Multiple runs - scenario 2
+
+```{r}
+set.seed(1)
+niter = 500
+res2_add = replicate(niter, single_run_add_dose(N = 36, n_per_cohort = 3, target = 0.33, p_true = p_true_2_add, p.tox0 = p.tox0_add, dose = dose_add, train_frac = 1/3, plt = FALSE))
+# visit frequency
+print("Percent of patients assigned to each dose over all trials")
+vf2_add_half1 = sapply(res2_add[1,], function(t) {
+summary = NULL
+for (i in 1:length(dose_add)) summary = c(summary, sum(t[1:(N*train_frac), 'dose'] == i))
+return(summary)
+})
+vf2_add_half2 = sapply(res2_add[1,], function(t) {
+summary = NULL
+for (i in 1:length(dose_add)) summary = c(summary, sum(t[(N*train_frac+1):N, 'dose'] == i))
+return(summary)
+})
+rowSums(vf2_add_half1) / (niter * N * train_frac)
+rowSums(vf2_add_half2) / (niter * N * (1-train_frac))
+# mtd
+print("Proportion of simulated trials recommending dose as MTD")
+# table(unlist(res1_add[5,])) / niter
+sapply(1:length(dose_add), function(t) mean(unlist(res2_add[5,]) == t))
+table(unlist(res2_add[6,])) / niter
+# True ptox
+print("True p's")
+p_true_2_add
+```
+
+For scenario 1 and 2, level 0 was added to 79% and 17% simulated trials after evaluation, respectively.
+
+### Compare classical and modified CRM
+
+Bar chart
+
+Scenario 1, dose visit 
+
+```{r}
+prop_no_adj = c(0, 0.44900000, 0.23800000, 0.20750000, 0.05933333, 0.04616667)
+prop_adj_s1 = c(0.0000, 0.5985, 0.0345, 0.1545, 0.0860, 0.1265)
+prop_adj_s2 = c(0.1570, 0.1740, 0.3145, 0.2960, 0.0550, 0.0035)
+doses = rep(0:5, 3)
+df_bar = data.frame(dose = as.factor(doses), prop = c(prop_no_adj, prop_adj_s1, prop_adj_s2), case = rep(c('no_adj', 'adj_s1', 'adj_s2'), c(6, 6, 6)))
+p1 = df_bar$case = factor(df_bar$case, levels = c('no_adj', 'adj_s1', 'adj_s2'))
+ggplot(df_bar, aes(x = dose, y = prop, fill = case)) + geom_bar(stat = "identity", position = position_dodge()) + theme_bw() + theme(aspect.ratio=4/3) + ggtitle('Case 1, true ptox = 0.3 at level 2')
+p1
+```
+
+Scenario 2, dose visit 
+
+```{r}
+prop_no_adj = c(0, 0.08816667, 0.00950000, 0.11066667, 0.45316667, 0.33850000)
+prop_adj_s1 = c(0.000000000, 0.342666667, 0.001333333, 0.045333333, 0.127333333, 0.483333333)
+prop_adj_s2 = c(0.018666667, 0.003333333, 0.016444444, 0.117777778, 0.558888889, 0.284888889)
+doses = rep(0:5, 3)
+df_bar = data.frame(dose = as.factor(doses), prop = c(prop_no_adj, prop_adj_s1, prop_adj_s2), case = rep(c('no_adj', 'adj_s1', 'adj_s2'), c(6, 6, 6)))
+p2 = df_bar$case = factor(df_bar$case, levels = c('no_adj', 'adj_s1', 'adj_s2'))
+ggplot(df_bar, aes(x = dose, y = prop, fill = case)) + geom_bar(stat = "identity", position = position_dodge()) + theme_bw() + theme(aspect.ratio=4/3) + ggtitle('Case 2, true ptox = 0.3 at level 4')
+p2
+```
+
+Scenario 1, mtd 
+
+```{r}
+prop_no_adj = c(0, 0.374, 0.390, 0.218, 0.018, 0.000)
+prop_adj = c(0.056, 0.282, 0.464, 0.190, 0.008, 0.000)
+mtd = rep(0:5, 2)
+df_bar = data.frame(mtd = as.factor(mtd), prop = c(prop_no_adj, prop_adj), case = rep(c('no_adj', 'adj'), c(6, 6)))
+df_bar$case = factor(df_bar$case, levels = c('no_adj', 'adj'))
+p3 = ggplot(df_bar, aes(x = mtd, y = prop, fill = case)) + geom_bar(stat = "identity", position = position_dodge()) + theme_bw() + theme(aspect.ratio=4/3) + ggtitle('Case 1, true ptox = 0.3 at level 2')
+p3
+```
+
+Scenario 2, mtd 
+
+```{r}
+prop_no_adj = c(0, 0.00, 0.00, 0.11, 0.67, 0.22)
+prop_adj = c(0.000, 0.000, 0.002, 0.096, 0.676, 0.226)
+mtd = rep(0:5, 2)
+df_bar = data.frame(mtd = as.factor(mtd), prop = c(prop_no_adj, prop_adj), case = rep(c('no_adj', 'adj'), c(6, 6)))
+p4 = df_bar$case = factor(df_bar$case, levels = c('no_adj', 'adj'))
+ggplot(df_bar, aes(x = mtd, y = prop, fill = case)) + geom_bar(stat = "identity", position = position_dodge()) + theme_bw() + theme(aspect.ratio=4/3) + ggtitle('Case 2, true ptox = 0.3 at level 4')
+p4
+```
+
+![](Bonus_q_results_Bowei.png)
 
 
 # Results and Discussion
