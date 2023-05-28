@@ -3,11 +3,11 @@ title: 'Final Project: Bayesian Inference Clinical Trials and Nonparametric Mode
 author: "Non-stat Team: Captain: Xinyi Zhang, Members: Bowei Kang, Gabriel Nicholson, Hongzhang Xie, Tongtong Jin, Ujjwal Sehrawat, Wenqian Zhang, William Olaprath, Yiwei Ding, Zikai Li"
 date: "`r Sys.Date()`"
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     extra_dependencies: hyperref
     keep_tex: yes
+  html_document:
+    df_print: paged
 header-includes:
 - \usepackage{hyperref}
 - \hypersetup{colorlinks=true, citecolor=blue, linkcolor=blue, urlcolor=blue}
@@ -363,16 +363,18 @@ The standard dose recommendation rule in the use of the CRM relies on point esti
 
 An alternative is to use Bayes risk for posterior probability intervals associated with each dose as the inferential summary (Neuenschwander, Branson and Gsponer, 2008). We first define Bayes risk values for each of the following intervals:
 
-\begin{aligned*}
+$$
 L(\theta, d)= \begin{cases}\ell_1=1 & \text { if } \pi_\theta(d) \in(0,0.31] \\
 \ell_2=0 & \text { if } \pi_\theta(d) \in(0.31,0.35] \\
 \ell_3=1 & \text { if } \pi_\theta(d) \in(0.35,0.6] \\
 \ell_4=2 & \text { if } \pi_\theta(d) \in(0.6,1]\end{cases}
-\end{aligned*}
+$$
 
 After each cohort of patients has gone through the trial, we estimate the posterior distributions of toxicity for each dose level, $\pi_\theta(d)$. The Bayes risk of each dose level is calculated as follows:
 
-$\ell_1 P\left\{\pi_\theta(d) \in\right.\right. \left.(0,0.31]\}+\ell_2 P\left\{\pi_\theta(d) \in(0.31,0.35]\right\}+\ell_3 P\left\{\pi_\theta(d) \in(0.35,0.6]\right\}+\ell_4 P\left\{\pi_\theta(d) \in(0.6,1]\right\}$
+$$
+\ell_1 P\left\{\pi_\theta(d) \in (0,0.31]\right \}+\ell_2 P\left\{\pi_\theta(d) \in(0.31,0.35]\right\}+\ell_3 P\left\{\pi_\theta(d) \in(0.35,0.6]\right\}+\ell_4 P\left\{\pi_\theta(d) \in(0.6,1]\right\}
+$$
 
 After each 36-patient trial is concluded, data is pooled for calculating the Bayes risk for each dose level. The dose level with the lowest Bayes risk is recommended as the dose level for the next cohort. The trial terminates when all 36 patients get treated and the MTD is determined basded on the overall Bayes risk of each dose level. 
 
@@ -394,7 +396,7 @@ This is an aggressive solution for helping the model become "unstuck" from overs
 
 ### 4.4.3 Conditionally adding extra lower dose level (by Bowei Kang)
 
-The idea is increasing estimate accuracy by expanding the dose range. In a simple linear regression, $Y = \alpha + \beta X + \epsilon$, $Var(\hat{\beta} = \sigma^2 (X′X)^{-1}$. Small sample variation in $X$ leads to the inflation in standard error of the estimate. 
+The idea is increasing estimate accuracy by expanding the dose range. In a simple linear regression, $Y = \alpha + \beta X + \epsilon$, $Var(\hat{\beta} = \sigma^2 (X'X)^{-1}$. Small sample variation in $X$ leads to the inflation in standard error of the estimate. 
 
 We propose the following design: at the 1/3 cut point of the trail, we evaluate the dose visit frequency. If the distribution is too skewed to the right, that is, most patients are assigned to dose level 1, an extra lower level 0 will be added for the remaining 2/3 patients. Otherwise, we continue the previous standard CRM design.
 
