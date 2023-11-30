@@ -3,10 +3,6 @@
 
 This repository contains the final project for our graduate-level class in Bayesian modeling and inference. The project involves the implementation of a logistic regression model, simulation studies, and performance analysis in the context of clinical trials.
 
-## Team
-
-- Captain: Xinyi Zhang
-- Members: ...
 
 ## Task Overview
 Our main tasks involve:
